@@ -4,301 +4,283 @@
   <meta charset="UTF-8" />
   <title>TABIMEMO | 旅にも仕事にも使える行程メモ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta
-    name="description"
-    content="移動の予定をまとめて、すぐ共有。旅にも仕事にも使えるシンプルな行程メモ TABIMEMO。"
-  />
-
-  <!-- GA4（解析用） -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MDH61JPWSB"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-MDH61JPWSB');
-  </script>
-
-  <!-- Firebase SDK（互換レイヤー版） -->
-  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-analytics-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
-  <script>
-    // あなたの Firebase 設定（コンソール表示そのまま）
-    const firebaseConfig = {
-      apiKey: "AIzaSyBABBAcAmnnv8gAmlCO6M6xKcvP7uAWi64",
-      authDomain: "tabimemo-842cb.firebaseapp.com",
-      projectId: "tabimemo-842cb",
-      storageBucket: "tabimemo-842cb.appspot.com",
-      messagingSenderId: "689682021634",
-      appId: "1:689682021634:web:49c603cda4ac758aa34afb",
-      measurementId: "G-MDH61JPWSB"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const analytics = firebase.analytics();
-    const db = firebase.firestore();
-  </script>
-
   <style>
     :root {
-      --bg-gradient-from: #bbf7d0; /* 緑 */
-      --bg-gradient-to: #fef9c3;   /* 黄 */
-      --card-bg: #fefce8;
-      --card-border: #facc15;
-      --accent-blue: #2563eb;
-      --text-main: #111827;
-      --text-muted: #6b7280;
+      color-scheme: light;
     }
-
     * {
       box-sizing: border-box;
     }
-
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       margin: 0;
+      padding: 24px 16px 40px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #16a34a 0%, #84cc16 45%, #bef264 100%);
       min-height: 100vh;
-      padding: 16px;
-      background: linear-gradient(135deg, var(--bg-gradient-from), var(--bg-gradient-to));
-      color: var(--text-main);
       display: flex;
       justify-content: center;
+      color: #111827;
     }
-
-    .container {
+    .wrapper {
       width: 100%;
       max-width: 960px;
     }
-
     h1 {
-      font-size: 1.8rem;
-      margin: 0 0 4px;
-      letter-spacing: 0.12em;
+      margin: 0;
+      font-size: 2.2rem;
+      letter-spacing: 0.08em;
     }
-
     .app-header {
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 18px;
-      padding: 16px 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
-      margin-bottom: 18px;
-      border: 1px dashed rgba(37, 99, 235, 0.25);
+      background: radial-gradient(circle at 0 0, #fee2e2 0, transparent 55%),
+                  radial-gradient(circle at 100% 100%, #dbeafe 0, transparent 55%),
+                  #ffffff;
+      border-radius: 20px;
+      padding: 20px 20px 18px;
+      box-shadow: 0 16px 30px rgba(22, 101, 52, 0.35);
       position: relative;
       overflow: hidden;
+      border: 3px solid #facc15;
+      margin-bottom: 16px;
     }
-
-    .app-title-row {
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .logo-pill {
+    .app-title-badge {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      padding: 4px 10px;
+      gap: 6px;
+      padding: 6px 14px;
       border-radius: 999px;
-      background: #fef9c3;
-      border: 1px solid #facc15;
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: #b45309;
-    }
-
-    .tagline {
-      margin-top: 6px;
-      font-size: 0.9rem;
-      color: var(--text-main);
-      font-weight: 500;
-    }
-
-    .tagline-sub {
-      margin-top: 2px;
+      background: #f97316;
+      color: #fff;
       font-size: 0.8rem;
-      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .app-title-chip {
+      display: inline-block;
+      padding: 6px 12px;
+      background: #ffffff;
+      border-radius: 999px;
+      border: 2px solid #facc15;
+      box-shadow: 0 4px 0 #fbbf24;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      margin-bottom: 4px;
+    }
+    .app-title-dot {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      border-radius: 999px;
+      border: 3px dotted #f97316;
+      top: -26px;
+      right: -18px;
+      background-image: radial-gradient(#f97316 2px, transparent 2px),
+                        radial-gradient(#3b82f6 2px, transparent 2px);
+      background-position: 0 0, 6px 6px;
+      background-size: 12px 12px;
+      opacity: 0.8;
+    }
+    .app-subtitle {
+      margin: 4px 0 4px;
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+    .app-description {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #4b5563;
     }
 
     .card {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 14px 16px 16px;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
-      border: 1px solid var(--card-border);
-      margin-bottom: 12px;
+      background: #fef9c3;
+      border-radius: 14px;
+      padding: 16px 16px 14px;
+      box-shadow: 0 6px 18px rgba(22, 101, 52, 0.25);
+      margin-bottom: 14px;
+      border: 1px solid #facc15;
     }
-
     .card h2 {
+      font-size: 1.0rem;
       margin: 0 0 8px;
-      font-size: 1rem;
     }
-
     label {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       display: block;
       margin-top: 8px;
     }
-
-    input,
-    textarea,
-    select {
+    input, textarea, select {
       width: 100%;
-      padding: 8px;
-      border-radius: 8px;
+      padding: 7px 9px;
+      border-radius: 10px;
       border: 1px solid #d4d4d8;
       margin-top: 4px;
-      font-size: 0.9rem;
+      font-size: 0.89rem;
       font-family: inherit;
-      color: var(--text-main);
       background: #ffffff;
     }
-
     input::placeholder,
     textarea::placeholder {
       color: #9ca3af;
     }
-
-    .eta-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 4px;
+    textarea {
+      resize: vertical;
+      min-height: 46px;
     }
-
-    .eta-row select {
-      flex: 1;
-    }
-
     button {
       border: none;
       border-radius: 999px;
       padding: 8px 16px;
       font-size: 0.9rem;
       cursor: pointer;
-      margin-top: 12px;
-      font-family: inherit;
+      margin-top: 10px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
-
     .btn-primary {
-      background: var(--accent-blue);
+      background: #16a34a;
       color: #fff;
+      box-shadow: 0 4px 0 #15803d;
     }
-
+    .btn-primary:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 0 #15803d;
+    }
     .btn-secondary {
       background: #e4e4e7;
       color: #111827;
     }
-
-    .btn-secondary.small-btn {
-      padding: 4px 8px;
-      font-size: 0.75rem;
+    .btn-secondary:active {
+      transform: translateY(1px);
     }
-
     .dest-list {
       list-style: none;
       padding: 0;
       margin: 0;
     }
-
     .dest-item {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
       gap: 8px;
       padding: 8px 0;
-      border-bottom: 1px solid #e4e4e7;
+      border-bottom: 1px dashed #eab308;
     }
-
     .dest-main {
       flex: 1;
     }
-
     .dest-title {
       font-weight: 600;
       font-size: 0.95rem;
+      color: #374151;
     }
-
     .dest-url {
       font-size: 0.8rem;
-      color: var(--accent-blue);
+      color: #2563eb;
       word-break: break-all;
+      text-decoration: none;
     }
-
+    .dest-url:hover {
+      text-decoration: underline;
+    }
     .dest-meta {
-      font-size: 0.8rem;
-      color: var(--text-muted);
+      font-size: 0.78rem;
+      color: #6b7280;
       margin-top: 4px;
     }
-
+    .dest-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .small-btn {
+      padding: 3px 8px;
+      font-size: 0.75rem;
+    }
+    .share-link {
+      font-size: 0.8rem;
+      word-break: break-all;
+      margin-top: 6px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      background: #fefce8;
+      border: 1px dashed #eab308;
+    }
     .share-label {
       font-size: 0.8rem;
       font-weight: 600;
       margin-top: 8px;
     }
-
-    .share-link {
-      font-size: 0.8rem;
-      word-break: break-all;
+    .note-text {
+      font-size: 0.78rem;
+      color: #4b5563;
       margin-top: 4px;
-      color: #374151;
     }
-
-    @media (max-width: 600px) {
-      .app-header {
-        padding: 12px 14px;
+    .status-message {
+      font-size: 0.8rem;
+      margin-top: 4px;
+      color: #065f46;
+    }
+    @media (min-width: 720px) {
+      body {
+        padding: 32px 24px 48px;
       }
       h1 {
-        font-size: 1.4rem;
+        font-size: 2.4rem;
+      }
+      .card {
+        padding: 18px 18px 16px;
       }
     }
   </style>
 </head>
-
 <body>
-  <div class="container">
+  <div class="wrapper">
     <header class="app-header">
-      <div class="logo-pill">TABIMEMO</div>
-      <div class="app-title-row">
-        <h1>移動の予定をまとめて、すぐ共有。</h1>
-      </div>
-      <p class="tagline">旅にも仕事にも使える行程メモ。</p>
-      <p class="tagline-sub">
+      <div class="app-title-badge">🚉 ルート管理メモ</div>
+      <div class="app-title-chip">TABIMEMO</div>
+      <h1>移動の予定をまとめて、すぐ共有。</h1>
+      <p class="app-subtitle">旅にも仕事にも使える行程メモ。</p>
+      <p class="app-description">
         行き先のURL・順番・移動手段・所要時間をまとめて、URLひとつで仲間と共有できます。
       </p>
+      <div class="app-title-dot"></div>
     </header>
 
     <div class="card">
       <h2>旅・仕事プランのタイトル</h2>
       <label>
-        タイトル（例：四国一周サーフトリップ、徳島FW1日目、東京営業ルート など）
-        <input
-          id="tripTitleInput"
-          placeholder="例：徳島FW1日目・鳴門エリアフィールドワーク"
-        />
+        タイトル
+        <input id="tripTitleInput" placeholder="例：四国一周サーフトリップ、徳島FW1日目、東京営業ルート など" />
       </label>
     </div>
 
     <div class="card">
       <h2>① 行き先を追加</h2>
-
       <label>
-        行き先の名前（例：1日目ホテル、ひろめ市場、A社本社ビル など）
-        <input id="titleInput" placeholder="例：A社本社ビル（商談）、ひろめ市場、1日目ホテル" />
+        行き先の名前
+        <input id="titleInput" placeholder="例：1日目ホテル、ひろめ市場、A社本社ビル など" />
       </label>
-
       <label>
         行き先URL（公式サイトやGoogleマップのURL）
-        <input id="urlInput" placeholder="例：https://maps.google.com/..." />
+        <input id="urlInput" placeholder="例：https://maps.google.com/… や https://〜 など" />
       </label>
 
-      <label>
-        到着予定時間（任意）
-        <div class="eta-row">
-          <select id="etaHourSelect"></select>
-          <select id="etaMinuteSelect"></select>
-        </div>
-      </label>
+      <label>到着予定時間（任意）</label>
+      <div style="display:flex; gap:8px; margin-top:4px;">
+        <select id="etaHour" style="flex:0 0 40%;">
+          <option value="">-- 時 --</option>
+          <!-- 0〜23時 -->
+          <script>
+            // 後でまとめて挿入するのでここは空
+          </script>
+        </select>
+        <select id="etaMinute" style="flex:0 0 40%;">
+          <option value="">-- 分 --</option>
+          <script>
+          </script>
+        </select>
+      </div>
 
       <label>
         前の地点からの移動手段
@@ -312,28 +294,18 @@
           <option value="plane">✈️ 飛行機</option>
         </select>
       </label>
-
       <label>
         前の地点からの移動時間（分）
-        <input
-          id="travelMinutesInput"
-          type="number"
-          min="0"
-          placeholder="例：25（Googleマップの結果をそのまま入力）"
-        />
+        <input id="travelMinutesInput" type="number" min="0"
+               placeholder="例：25（Googleマップの結果をそのまま入力）" />
       </label>
-
       <label>
         メモ（任意）
-        <textarea
-          id="noteInput"
-          rows="2"
-          placeholder="集合場所、注意点（例：現地集合／駐車場あり／雨天時は◯◯に変更 など）"
-        ></textarea>
+        <textarea id="noteInput" rows="2"
+          placeholder="例：〇〇駅改札前に9:50集合、A社は3階受付で名刺提出 など"></textarea>
       </label>
-
       <button class="btn-primary" onclick="addDestination()">リストに追加</button>
-      <p style="font-size:0.75rem;color:#6b7280;margin-top:8px;">
+      <p class="note-text">
         ※ 正確な移動時間は Googleマップで確認して、「移動時間（分）」に入力すると便利です。
       </p>
     </div>
@@ -341,7 +313,7 @@
     <div class="card">
       <h2>② 行き先リスト＆順番</h2>
       <ul id="destList" class="dest-list"></ul>
-      <p style="font-size:0.8rem;color:#4b5563;margin-top:8px;">
+      <p class="note-text">
         ※ 並び順がそのままルート順（1 → 2 → 3…）になります。<br />
         「↑」「↓」ボタンで順番を変えられます。
       </p>
@@ -356,20 +328,41 @@
       <div class="share-label">長い共有リンク：</div>
       <div id="shareLink" class="share-link"></div>
 
-      <button class="btn-secondary" onclick="generateCloudShortLink()">
+      <button class="btn-secondary" onclick="generateShortCloudLink()">
         短い共有リンクを作成（どの端末でも再現可・クラウド保存）
       </button>
       <div class="share-label">短い共有リンク：</div>
       <div id="shortLink" class="share-link"></div>
 
-      <p style="font-size:0.8rem;color:#6b7280;margin-top:8px;">
+      <p class="note-text">
         ・長いリンク：URLに行程データ全部を埋め込む方式。どこに送っても再現できます（かなり長くなります）。<br />
         ・短いリンク：行程データをクラウド（Firestore）に保存し、「?p=XXXX」形式の短いURLで呼び出します。
       </p>
+      <p id="statusMessage" class="status-message"></p>
     </div>
   </div>
 
+  <!-- Firebase（互換版 SDK） -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore-compat.js"></script>
+
   <script>
+    // ===== Firebase 初期化（あなたのプロジェクト設定） =====
+    const firebaseConfig = {
+      apiKey: "AIzaSyB8ABc4mmne0gVAmLC0M6xKcvP7uAWi64",
+      authDomain: "tabimemo-842cb.firebaseapp.com",
+      projectId: "tabimemo-842cb",
+      storageBucket: "tabimemo-842cb.appspot.com",
+      messagingSenderId: "689682021634",
+      appId: "1:689682021634:web:49c603cda4ac758aa34afb",
+      measurementId: "G-MDH61JPSWB"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    db.settings({ ignoreUndefinedProperties: true });
+
+    // ===== アプリ本体ロジック =====
     let destinations = [];
     let tripTitle = "";
 
@@ -379,64 +372,49 @@
       bus: "🚌 バス",
       walk: "🚶 徒歩",
       bike: "🚲 自転車",
-      plane: "✈️ 飛行機",
+      plane: "✈️ 飛行機"
     };
 
-    function initEtaSelects() {
-      const hourSel = document.getElementById("etaHourSelect");
-      const minSel = document.getElementById("etaMinuteSelect");
-      if (!hourSel || !minSel) return;
-
-      hourSel.innerHTML = '<option value="">-- 時 --</option>';
-      for (let h = 0; h < 24; h++) {
-        const v = String(h).padStart(2, "0");
-        const opt = document.createElement("option");
-        opt.value = v;
-        opt.textContent = `${v} 時`;
-        hourSel.appendChild(opt);
-      }
-
-      minSel.innerHTML = '<option value="">-- 分 --</option>';
-      for (let m = 0; m < 60; m++) {
-        const v = String(m).padStart(2, "0");
-        const opt = document.createElement("option");
-        opt.value = v;
-        opt.textContent = `${v} 分`;
-        minSel.appendChild(opt);
-      }
-    }
-
     function syncTripTitle() {
-      const input = document.getElementById("tripTitleInput");
-      tripTitle = (input?.value || "").trim();
+      tripTitle = document.getElementById("tripTitleInput").value.trim();
     }
 
     document.getElementById("tripTitleInput").addEventListener("input", syncTripTitle);
+
+    // 時・分のプルダウンを埋める
+    (function fillTimeSelects () {
+      const hourSel = document.getElementById("etaHour");
+      const minuteSel = document.getElementById("etaMinute");
+      for (let h = 0; h < 24; h++) {
+        const o = document.createElement("option");
+        o.value = String(h).padStart(2, "0");
+        o.textContent = String(h).padStart(2, "0") + " 時";
+        hourSel.appendChild(o);
+      }
+      for (let m = 0; m < 60; m++) {
+        const o = document.createElement("option");
+        o.value = String(m).padStart(2, "0");
+        o.textContent = String(m).padStart(2, "0") + " 分";
+        minuteSel.appendChild(o);
+      }
+    })();
 
     function addDestination() {
       syncTripTitle();
 
       const title = document.getElementById("titleInput").value.trim();
       const url = document.getElementById("urlInput").value.trim();
-      const hour = document.getElementById("etaHourSelect").value;
-      const minute = document.getElementById("etaMinuteSelect").value;
+      const hour = document.getElementById("etaHour").value;
+      const minute = document.getElementById("etaMinute").value;
+      const eta = (hour || minute) ? `${hour || "--"}:${minute || "--"}` : "";
       const transport = document.getElementById("transportInput").value;
-      const travelMinutesValue =
-        document.getElementById("travelMinutesInput").value;
-      const travelMinutes =
-        travelMinutesValue === "" ? null : Number(travelMinutesValue);
+      const travelMinutesValue = document.getElementById("travelMinutesInput").value;
+      const travelMinutes = travelMinutesValue === "" ? null : Number(travelMinutesValue);
       const note = document.getElementById("noteInput").value.trim();
 
       if (!title && !url) {
         alert("少なくとも「行き先の名前」か「URL」のどちらかは入力してください。");
         return;
-      }
-
-      let eta = "";
-      if (hour && minute) {
-        eta = `${hour}:${minute}`;
-      } else if (hour || minute) {
-        eta = `${hour || "??"}:${minute || "??"}`;
       }
 
       destinations.push({
@@ -446,13 +424,13 @@
         eta,
         transport,
         travelMinutes,
-        note,
+        note
       });
 
       document.getElementById("titleInput").value = "";
       document.getElementById("urlInput").value = "";
-      document.getElementById("etaHourSelect").value = "";
-      document.getElementById("etaMinuteSelect").value = "";
+      document.getElementById("etaHour").value = "";
+      document.getElementById("etaMinute").value = "";
       document.getElementById("transportInput").value = "";
       document.getElementById("travelMinutesInput").value = "";
       document.getElementById("noteInput").value = "";
@@ -478,16 +456,6 @@
     function renderList() {
       const ul = document.getElementById("destList");
       ul.innerHTML = "";
-
-      if (destinations.length === 0) {
-        const li = document.createElement("li");
-        li.className = "dest-item";
-        li.innerHTML =
-          '<div class="dest-main"><div class="dest-title" style="color:#9ca3af;">例）1. A社本社ビル（商談）</div><div class="dest-meta">到着予定：10:00 ｜ 移動手段：🚃 電車 ｜ 前の地点からの移動時間：約 25 分</div><div class="dest-meta">メモ：受付で担当者名を伝えてください</div></div>';
-        ul.appendChild(li);
-        return;
-      }
-
       destinations.forEach((d, i) => {
         const li = document.createElement("li");
         li.className = "dest-item";
@@ -511,14 +479,17 @@
         }
 
         const metaLines = [];
+
         if (d.eta) {
           metaLines.push(`到着予定：${d.eta}`);
         } else {
           metaLines.push("到着予定：未設定");
         }
+
         if (d.transport) {
           metaLines.push(`移動手段：${transportIcons[d.transport] || d.transport}`);
         }
+
         if (d.travelMinutes != null && !Number.isNaN(d.travelMinutes)) {
           metaLines.push(`前の地点からの移動時間：約 ${d.travelMinutes} 分`);
         }
@@ -538,21 +509,23 @@
         }
 
         const actions = document.createElement("div");
+        actions.className = "dest-actions";
+
         const upBtn = document.createElement("button");
         upBtn.textContent = "↑";
-        upBtn.className = "btn-secondary small-btn";
+        upBtn.className = "small-btn btn-secondary";
         upBtn.onclick = () => moveDestination(i, -1);
         actions.appendChild(upBtn);
 
         const downBtn = document.createElement("button");
         downBtn.textContent = "↓";
-        downBtn.className = "btn-secondary small-btn";
+        downBtn.className = "small-btn btn-secondary";
         downBtn.onclick = () => moveDestination(i, 1);
         actions.appendChild(downBtn);
 
         const delBtn = document.createElement("button");
         delBtn.textContent = "削除";
-        delBtn.className = "btn-secondary small-btn";
+        delBtn.className = "small-btn btn-secondary";
         delBtn.onclick = () => deleteDestination(i);
         actions.appendChild(delBtn);
 
@@ -566,11 +539,11 @@
       syncTripTitle();
       return {
         title: tripTitle,
-        destinations,
+        destinations
       };
     }
 
-    // どこでも使える「長い共有リンク」
+    // どこでも再現できる長い共有リンク
     function generateShareLink() {
       if (destinations.length === 0) {
         alert("行き先が1つもありません。まず追加してください。");
@@ -580,161 +553,99 @@
       const json = JSON.stringify(data);
       const b64 = btoa(encodeURIComponent(json));
 
-      const base =
-        window.location.origin +
-        window.location.pathname.split("?")[0].split("#")[0];
+      const base = window.location.origin + window.location.pathname.replace(/index\.html$/, "");
       const url = `${base}?plan=${b64}`;
 
       const container = document.getElementById("shareLink");
       container.textContent = url;
 
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(url).catch(() => {});
-      }
+      navigator.clipboard?.writeText(url).catch(() => {});
+      setStatusMessage("長い共有リンクをコピーしました。");
     }
 
-    // Firestore を使った「短い共有リンク」
-    async function generateCloudShortLink() {
-      if (!db) {
-        alert("クラウド保存用の初期化に失敗しました。ページを再読み込みしてください。");
-        return;
-      }
+    // Firestore に保存する短い共有リンク
+    async function generateShortCloudLink() {
       if (destinations.length === 0) {
         alert("行き先が1つもありません。まず追加してください。");
         return;
       }
-
       const data = getCurrentPlanData();
-      const shortId =
-        "p_" +
-        Date.now().toString(36) +
-        Math.random().toString(36).slice(2, 8);
-
       try {
-        await db.collection("plans").doc(shortId).set({
-          payload: data,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        setStatusMessage("クラウドに保存中…");
+        const docRef = await db.collection("tabimemoPlans").add({
+          ...data,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
+        const shortId = docRef.id;
 
-        let base =
-          window.location.origin +
-          window.location.pathname.split("?")[0].split("#")[0];
-        if (!base.endsWith("/")) base += "/";
-        const url = `${base}?p=${shortId}`;
+        const base = window.location.origin + window.location.pathname.replace(/index\.html$/, "");
+        const url = `${base}?p=${encodeURIComponent(shortId)}`;
 
         const container = document.getElementById("shortLink");
         container.textContent = url;
 
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(url).catch(() => {
-            container.textContent =
-              url + "（コピーに失敗しました。手動でコピーしてください）";
-          });
-        }
-
-        alert("クラウドに保存し、どの端末でも使える短い共有リンクを作成しました。");
+        navigator.clipboard?.writeText(url).catch(() => {});
+        setStatusMessage("短い共有リンクをクラウドに保存し、コピーしました。");
       } catch (e) {
-        console.error("クラウド短縮リンクの作成に失敗しました", e);
-        alert("短い共有リンクの作成に失敗しました。時間をおいて再試行してください。");
+        console.error(e);
+        setStatusMessage("クラウド保存に失敗しました。時間をおいて再度お試しください。");
       }
     }
 
-    // ?p=... があれば Firestore から読み込む
-    async function loadPlanFromCloudIfNeeded() {
+    function setStatusMessage(msg) {
+      document.getElementById("statusMessage").textContent = msg || "";
+    }
+
+    // URL から plan / p を読んで復元
+    async function restoreFromUrl() {
       const params = new URLSearchParams(window.location.search);
-      const pid = params.get("p");
-      if (!pid) return false;
-      if (!db) return false;
+      const planParam = params.get("plan");
+      let shortParam = params.get("p");
 
-      try {
-        const snap = await db.collection("plans").doc(pid).get();
-        if (!snap.exists) {
-          console.warn("指定されたプランが見つかりませんでした:", pid);
-          return false;
-        }
-        const data = snap.data();
-        const plan = data.payload || data;
-        if (!plan || !Array.isArray(plan.destinations)) {
-          console.warn("プランデータの形式が不正です:", plan);
-          return false;
-        }
-
-        destinations = plan.destinations;
-        tripTitle = plan.title || "";
-
-        const titleInput = document.getElementById("tripTitleInput");
-        if (titleInput) titleInput.value = tripTitle;
-
-        renderList();
-        return true;
-      } catch (e) {
-        console.error("クラウドからの読み込みに失敗しました", e);
-        return false;
+      // 旧バージョン互換（#p=xxxx）
+      if (!shortParam && window.location.hash.startsWith("#p=")) {
+        shortParam = window.location.hash.slice(3);
       }
-    }
 
-    // 旧来の ?plan=... リンクやハッシュ短縮リンクを読む（後方互換）
-    function loadFromUrlOrHash() {
-      const params = new URLSearchParams(location.search);
-      const dataParam = params.get("plan");
-
-      if (dataParam) {
+      if (planParam) {
         try {
-          const json = JSON.parse(decodeURIComponent(atob(dataParam)));
-          if (Array.isArray(json)) {
-            destinations = json;
-            tripTitle = "";
-          } else if (json && Array.isArray(json.destinations)) {
-            destinations = json.destinations;
-            tripTitle = json.title || "";
+          const json = decodeURIComponent(atob(planParam));
+          const parsed = JSON.parse(json);
+          if (parsed && Array.isArray(parsed.destinations)) {
+            destinations = parsed.destinations;
+            tripTitle = parsed.title || "";
+            document.getElementById("tripTitleInput").value = tripTitle;
+            renderList();
+            setStatusMessage("URL から行程を読み込みました。");
           }
-          const titleInput = document.getElementById("tripTitleInput");
-          if (titleInput) titleInput.value = tripTitle;
-          renderList();
-          return;
         } catch (e) {
-          console.error("共有データ(plan)の読み込みに失敗しました", e);
+          console.error("plan 読み込み失敗", e);
         }
-      }
-
-      // 旧ローカル短縮リンク (#p=...) 対応（同じブラウザ内だけ）
-      const hash = location.hash.replace(/^#/, "");
-      if (!hash) {
-        renderList();
-        return;
-      }
-      const hashParams = new URLSearchParams(hash);
-      const pid = hashParams.get("p");
-      if (!pid) {
-        renderList();
         return;
       }
 
-      try {
-        const stored = JSON.parse(localStorage.getItem("tripPlans") || "{}");
-        const plan = stored[pid];
-        if (plan && Array.isArray(plan.destinations)) {
-          destinations = plan.destinations;
-          tripTitle = plan.title || "";
-          const titleInput = document.getElementById("tripTitleInput");
-          if (titleInput) titleInput.value = tripTitle;
+      if (shortParam) {
+        try {
+          setStatusMessage("クラウドから行程を読み込み中…");
+          const doc = await db.collection("tabimemoPlans").doc(shortParam).get();
+          if (doc.exists) {
+            const data = doc.data() || {};
+            destinations = Array.isArray(data.destinations) ? data.destinations : [];
+            tripTitle = data.title || "";
+            document.getElementById("tripTitleInput").value = tripTitle;
+            renderList();
+            setStatusMessage("クラウドから行程を読み込みました。");
+          } else {
+            setStatusMessage("指定された短縮リンクの行程が見つかりませんでした。");
+          }
+        } catch (e) {
+          console.error("p 読み込み失敗", e);
+          setStatusMessage("クラウドからの読み込みに失敗しました。時間をおいて再度お試しください。");
         }
-      } catch (e) {
-        console.error("短縮リンクデータの読み込みに失敗しました", e);
       }
-      renderList();
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      initEtaSelects();
-      // まずクラウド短縮リンク (?p=...) を優先
-      loadPlanFromCloudIfNeeded().then((loaded) => {
-        if (!loaded) {
-          // ダメなら従来の ?plan= / #p= を見る
-          loadFromUrlOrHash();
-        }
-      });
-    });
+    restoreFromUrl();
   </script>
 </body>
 </html>
