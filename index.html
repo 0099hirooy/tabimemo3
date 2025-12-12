@@ -488,6 +488,26 @@
     const plansCol = db.collection("tabimemoPlans");
 
     /***********************
+     * Security: editKey generator
+     ***********************/
+    function generateEditKey(){
+      const buf = new Uint8Array(24);
+      crypto.getRandomValues(buf);
+      return btoa(String.fromCharCode(...buf))
+        .replaceAll('=', '')
+        .replaceAll('+', '-')
+        .replaceAll('/', '_');
+    }
+
+    /***********************
+     * URL params (p/k/plan)
+     ***********************/
+    const urlParams = new URLSearchParams(location.search);
+    const initialP = urlParams.get('p');
+    const initialK = urlParams.get('k');
+    const initialPlan = urlParams.get('plan');
+
+    /***********************
      * State
      ***********************/
     let destinations = [];
@@ -496,7 +516,10 @@
     let autocompleteService = null;
 
     // 共有リンク (?p=) のIDを保持（上書き保存用）
-    let currentPlanId = null;
+    let currentPlanId = initialP || null;
+
+    // 編集キー（k付きURLで来た場合のみ保持）
+    let currentEditKey = initialK || null;
 
     /***********************
      * DOM
@@ -599,7 +622,11 @@
 
     function updateShareStatus(){
       if(currentPlanId){
-        shareStatus.textContent = `共有プランを編集中（ID: ${currentPlanId}）— 短い共有リンクボタンで上書き保存できます。`;
+        if(currentEditKey){
+          shareStatus.textContent = `共有プランを編集中（ID: ${currentPlanId}）— 短い共有リンクボタンで上書き保存できます。`;
+        }else{
+          shareStatus.textContent = `閲覧モード（ID: ${currentPlanId}）— 編集するには「k付き（編集用）」リンクで開いてください。`;
+        }
       }else{
         shareStatus.textContent = `通常モード — 短い共有リンクボタンで新規保存して共有できます。`;
       }
@@ -678,7 +705,7 @@
       const name = pred.structured_formatting?.main_text || pred.description || '';
       spotNameInput.value = name;
 
-      // ★ここが「最後に一点」：スマホでも確実に開くURL形式へ
+      // ★スマホでも確実に開くURL形式へ
       selectedPlace = {
         name,
         placeId: pred.place_id,
@@ -954,34 +981,50 @@
       await copyText(url);
     });
 
-    // ★共有された側も編集できる：currentPlanIdがある場合は上書き保存
+    // ★安全化：編集キー（k）を持つ人だけ上書き保存できる
     shortShareBtn.addEventListener('click', async () => {
       if(destinations.length === 0){
         alert('行き先を追加してください。');
         return;
       }
+
+      const payload = currentPlanPayload();
+      const base = location.origin + location.pathname.replace(/index\.html$/,'');
+
       try{
-        const payload = currentPlanPayload();
-        const base = location.origin + location.pathname.replace(/index\.html$/,'');
+        // 既存プランを開いているが k が無い（閲覧リンク）＝編集不可
+        if(currentPlanId && !currentEditKey){
+          alert('このリンクは閲覧用です（編集キーがありません）。編集用リンク（k付き）で開いてください。');
+          return;
+        }
 
         if(currentPlanId){
+          // 上書き保存（editKey必須）
           await plansCol.doc(currentPlanId).set({
             title: payload.title || '',
             destinations: payload.destinations || [],
+            editKey: currentEditKey,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-          }, { merge: true });
+          }, { merge: false });
 
-          const url = `${base}?p=${currentPlanId}`;
+          const url = `${base}?p=${currentPlanId}&k=${currentEditKey}`;
           await copyText(url);
           showToast('上書き保存しました');
         }else{
+          // 新規保存（editKeyを生成）
+          const editKey = generateEditKey();
+
           const doc = await plansCol.add({
             title: payload.title || '',
             destinations: payload.destinations || [],
+            editKey,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           });
-          currentPlanId = doc.id; // 以後は上書き保存可能
-          const url = `${base}?p=${doc.id}`;
+
+          currentPlanId = doc.id;
+          currentEditKey = editKey;
+
+          const url = `${base}?p=${currentPlanId}&k=${currentEditKey}`;
           await copyText(url);
           showToast('保存して共有リンクを作成しました');
         }
@@ -989,7 +1032,7 @@
         updateShareStatus();
       }catch(e){
         console.error(e);
-        alert('短い共有リンクの作成／保存に失敗しました。Firestore設定を確認してください。');
+        alert('短い共有リンクの作成／保存に失敗しました。Firestoreルール（editKey対応）と設定を確認してください。');
       }
     });
 
@@ -997,9 +1040,8 @@
      * Load from URL
      ***********************/
     async function loadFromUrl(){
-      const params = new URLSearchParams(location.search);
-      const planParam = params.get('plan');
-      const pParam = params.get('p');
+      const planParam = initialPlan;
+      const pParam = initialP;
 
       if(planParam){
         const data = decodePlan(planParam);
@@ -1014,7 +1056,11 @@
             alert('共有データが見つかりませんでした。');
             return;
           }
+
           currentPlanId = pParam;
+          // ★k があれば編集モード（保存可能）
+          currentEditKey = initialK || null;
+
           const raw = snap.data() || {};
           const data = raw.payload && typeof raw.payload === 'object' ? raw.payload : raw;
           applyPlanData(data, true);
@@ -1029,7 +1075,7 @@
       }
     }
 
-    // ★ここでも「最後に一点」：既存データをスマホ向けURLに自動補正
+    // ★スマホ向けURL補正（既存データも含む）
     function normalizeDestinations(arr){
       if(!Array.isArray(arr)) return [];
       return arr.map(d => {
