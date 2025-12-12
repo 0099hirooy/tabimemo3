@@ -9,7 +9,7 @@
     content="移動の予定をまとめて、すぐ共有。旅にも仕事にも使えるシンプルな行程メモ TABIMEMO。"
   />
 
-  <!-- GA4（解析用：IDはあなたのものをそのまま使用） -->
+  <!-- GA4 -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-MDH61JPWSB"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -22,7 +22,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
   <script>
-    // あなたの Firebase 設定（tabimemo-842cb）
+    // Firebase 設定
     const firebaseConfig = {
       apiKey: "AIzaSyBABBAcAmnnv8gAmlCO6M6xKcvP7uAWi64",
       authDomain: "tabimemo-842cb.firebaseapp.com",
@@ -203,6 +203,12 @@
       padding: 8px 0;
       border-bottom: 1px dashed #eab308;
     }
+    .dest-item[draggable="true"] {
+      cursor: grab;
+    }
+    .dest-item.drag-over {
+      border-bottom: 2px solid #16a34a;
+    }
     .dest-main {
       flex: 1;
       font-size: 0.9rem;
@@ -226,8 +232,10 @@
     }
     .dest-actions {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       gap: 4px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
     .small-btn {
       padding: 3px 8px;
@@ -264,12 +272,19 @@
       border-radius: 6px;
       border: 1px solid #d4d4d8;
       font-size: 0.8rem;
+      font-family: inherit;
     }
     .edit-row-buttons {
       margin-top: 6px;
       display: flex;
       gap: 6px;
       flex-wrap: wrap;
+    }
+    .plan-title-display {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 6px;
     }
     @media (min-width: 720px) {
       body { padding: 32px 24px 48px; }
@@ -353,10 +368,11 @@
 
     <div class="card" id="listCard">
       <h2>② 行き先リスト＆順番</h2>
+      <div id="planTitleDisplay" class="plan-title-display"></div>
       <ul id="destList" class="dest-list"></ul>
       <p class="note-text">
         ※ 並び順がそのままルート順（1 → 2 → 3…）になります。<br />
-        「↑」「↓」「編集」ボタンで順番や内容を変えられます。
+        「↑」「↓」「編集」ボタン、またはドラッグ＆ドロップで順番や内容を変えられます。
       </p>
     </div>
 
@@ -384,10 +400,11 @@
   </div>
 
   <script>
-    // ===== アプリ状態 =====
+    // ===== 状態 =====
     let destinations = [];
     let tripTitle = "";
-    let editingIndex = null; // 行内編集中のインデックス
+    let editingIndex = null;
+    let dragIndex = null;
 
     const transportIcons = {
       car: "🚗 車",
@@ -398,9 +415,15 @@
       plane: "✈️ 飛行機"
     };
 
-    // ===== ユーティリティ =====
+    // ===== 共通ユーティリティ =====
     function setStatusMessage(msg) {
       document.getElementById("statusMessage").textContent = msg || "";
+    }
+
+    function updatePlanTitleDisplay() {
+      const el = document.getElementById("planTitleDisplay");
+      if (!el) return;
+      el.textContent = tripTitle ? `プランタイトル：${tripTitle}` : "";
     }
 
     function scrollToListIfNeeded() {
@@ -434,6 +457,7 @@
 
     function syncTripTitle() {
       tripTitle = document.getElementById("tripTitleInput").value.trim();
+      updatePlanTitleDisplay();
     }
     document.getElementById("tripTitleInput").addEventListener("input", syncTripTitle);
 
@@ -543,16 +567,63 @@
       return url.slice(0, 20) + "…";
     }
 
+    // ===== DnD ハンドラ =====
+    function handleDragStart(e) {
+      if (editingIndex !== null) {
+        e.preventDefault();
+        return;
+      }
+      dragIndex = Number(e.currentTarget.dataset.index);
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", dragIndex);
+      e.currentTarget.style.opacity = "0.5";
+    }
+
+    function handleDragOver(e) {
+      if (dragIndex === null) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+      const li = e.currentTarget;
+      li.classList.add("drag-over");
+    }
+
+    function handleDragLeave(e) {
+      e.currentTarget.classList.remove("drag-over");
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      const li = e.currentTarget;
+      li.classList.remove("drag-over");
+      const targetIndex = Number(li.dataset.index);
+      if (dragIndex === null || isNaN(targetIndex) || dragIndex === targetIndex) {
+        dragIndex = null;
+        return;
+      }
+      const moved = destinations.splice(dragIndex, 1)[0];
+      destinations.splice(targetIndex, 0, moved);
+      dragIndex = null;
+      renderList();
+    }
+
+    function handleDragEnd(e) {
+      e.currentTarget.style.opacity = "";
+      dragIndex = null;
+      const items = document.querySelectorAll(".dest-item.drag-over");
+      items.forEach(i => i.classList.remove("drag-over"));
+    }
+
     // ===== リスト描画 =====
     function renderList() {
       const ul = document.getElementById("destList");
       ul.innerHTML = "";
+      updatePlanTitleDisplay();
 
       if (destinations.length === 0) {
         const li = document.createElement("li");
         li.className = "dest-item";
         li.innerHTML =
-          '<div class="dest-main"><div class="dest-title" style="color:#9ca3af;">例）1. A社本社ビル（商談）</div><div class="dest-meta">到着予定：10:00 ｜ 移動手段：🚃 電車 ｜ 前の地点からの移動時間：約 25 分</div><div class="dest-meta">メモ：受付で担当者名を伝えてください</div></div>';
+          '<div class="dest-main"><div class="dest-title" style="color:#9ca3af;">例）10:00 ひろめ市場</div><div class="dest-meta">到着予定：10:00 ｜ 移動手段：🚃 電車 ｜ 前の地点からの移動時間：約 25 分</div><div class="dest-meta">メモ：受付で担当者名を伝えてください</div></div>';
         ul.appendChild(li);
         return;
       }
@@ -560,13 +631,27 @@
       destinations.forEach((d, i) => {
         const li = document.createElement("li");
         li.className = "dest-item";
+
+        // DnD 設定（編集中はドラッグ無効）
+        if (editingIndex === null) {
+          li.draggable = true;
+          li.dataset.index = i;
+          li.addEventListener("dragstart", handleDragStart);
+          li.addEventListener("dragover", handleDragOver);
+          li.addEventListener("dragleave", handleDragLeave);
+          li.addEventListener("drop", handleDrop);
+          li.addEventListener("dragend", handleDragEnd);
+        } else {
+          li.draggable = false;
+        }
+
         const main = document.createElement("div");
         main.className = "dest-main";
 
         if (editingIndex === i) {
           // 編集モード
           const titleLabel = document.createElement("div");
-          titleLabel.textContent = `${i + 1}. 行き先を編集`;
+          titleLabel.textContent = "行き先を編集";
           titleLabel.style.fontWeight = "600";
           titleLabel.style.fontSize = "0.9rem";
           main.appendChild(titleLabel);
@@ -648,7 +733,8 @@
           // 通常表示
           const title = document.createElement("div");
           title.className = "dest-title";
-          title.textContent = `${i + 1}. ${d.title || "(タイトルなし)"}`;
+          const label = d.title || "(タイトルなし)";
+          title.textContent = d.eta ? `${d.eta}  ${label}` : label;
           main.appendChild(title);
 
           if (d.url) {
@@ -663,12 +749,11 @@
             main.appendChild(urlLine);
           }
 
-          // Googleマップリンク（タイトルがある場合）
           if (d.title) {
             const g = document.createElement("a");
             g.href = "https://www.google.com/maps/search/?api=1&query=" +
                      encodeURIComponent(d.title);
-            g.textContent = "Googleマップで見る";
+            g.textContent = "Googleマップで確認";
             g.target = "_blank";
             g.rel = "noopener noreferrer";
             g.style.fontSize = "0.8rem";
@@ -679,9 +764,7 @@
           }
 
           const metaLines = [];
-          if (d.eta) {
-            metaLines.push(`到着予定：${d.eta}`);
-          } else {
+          if (!d.eta) {
             metaLines.push("到着予定：未設定");
           }
           if (d.transport) {
