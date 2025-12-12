@@ -2,388 +2,417 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>TABIMEMO - 旅ルート共有ミニアプリ</title>
+  <title>TABIMEMO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <style>
-    :root {
-      --bg-grad-start: #b4ec51;
-      --bg-grad-end: #8dd63f;
-      --card-yellow: #fff7c7;
-      --card-border: #f2d77a;
-      --item-bg: #ffffff;
-      --accent: #ff8f3c;
-      --accent-dark: #ff6a00;
-      --text-main: #333;
-      --text-sub: #666;
-      --danger: #e74c3c;
-      --link-blue: #0077cc;
+    :root{
+      --bg1:#b4ec51;      /* 緑寄り */
+      --bg2:#8dd63f;      /* 黄緑寄り */
+      --card:#fff3a6;     /* 黄色カード */
+      --cardBorder:#f2d77a;
+      --item:#ffffff;     /* リスト白 */
+      --text:#2b2b2b;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --btnBg:#ffffff;
+      --btnBorder:#d1d5db;
+      --btnHover:#f3f4f6;
+      --link:#1d4ed8;
+      --shadow: 0 2px 8px rgba(0,0,0,.10);
     }
 
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: linear-gradient(135deg, var(--bg-grad-start), var(--bg-grad-end));
-      color: var(--text-main);
+      color:var(--text);
+      background: linear-gradient(135deg, var(--bg1), var(--bg2));
     }
 
-    .wrapper {
-      max-width: 960px;
+    .wrap{
+      max-width: 980px;
       margin: 0 auto;
       padding: 16px 12px 40px;
     }
 
-    header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 12px;
+    /* ===== ヘッダー（TABIMEMO） ===== */
+    .hero{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:10px;
+      margin: 6px 0 16px;
     }
 
-    .logo-badge {
-      background: #fff;
-      border-radius: 999px;
-      padding: 8px 14px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-      font-weight: 700;
-      font-size: 1.1rem;
-      letter-spacing: .08em;
-      color: #0b7dda;
-    }
-
-    .logo-badge span {
-      color: #ff7f00;
-    }
-
-    header h1 {
-      font-size: 1rem;
-      font-weight: 600;
-      margin: 0;
-      color: var(--text-main);
-    }
-
-    header p {
-      margin: 2px 0 0;
-      font-size: .8rem;
-      color: var(--text-sub);
-    }
-
-    .card {
-      background: var(--card-yellow);
+    .tabimemo-badge{
+      position: relative;
+      padding: 14px 22px;
       border-radius: 18px;
-      padding: 16px 14px 18px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
-      border: 1px solid var(--card-border);
+      background: #fff;
+      border: 4px solid #ffd400; /* 黄色枠 */
+      box-shadow: var(--shadow);
+      text-align:center;
+      min-width: 240px;
+      overflow:hidden;
     }
 
-    .card h2 {
-      font-size: 1.05rem;
-      margin: 0 0 8px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
+    /* 青・赤の水玉（控えめ） */
+    .tabimemo-badge::before{
+      content:"";
+      position:absolute;
+      inset:-20px;
+      background:
+        radial-gradient(circle at 12px 12px, rgba(37, 99, 235, .25) 0 6px, transparent 7px),
+        radial-gradient(circle at 42px 32px, rgba(239, 68, 68, .22) 0 6px, transparent 7px),
+        radial-gradient(circle at 86px 20px, rgba(37, 99, 235, .20) 0 6px, transparent 7px),
+        radial-gradient(circle at 132px 42px, rgba(239, 68, 68, .18) 0 6px, transparent 7px);
+      background-size: 140px 70px;
+      pointer-events:none;
     }
 
-    .card h2 span.num {
-      font-size: .9rem;
-      opacity: .8;
+    .tabimemo-title{
+      position:relative;
+      z-index:1;
+      margin:0;
+      font-size: 34px;
+      line-height: 1;
+      letter-spacing: .08em;
+      font-weight: 900;
+      /* ほんのりポップ */
+      text-shadow: 0 2px 0 rgba(0,0,0,.06);
     }
 
-    .section-title-sub {
-      font-size: .8rem;
-      color: var(--text-sub);
-      margin-bottom: 6px;
+    .hero-subtitle{
+      margin:0;
+      font-weight: 800;
+      font-size: 14px;
+      color:#2b2b2b;
+      text-align:center;
     }
 
-    label {
-      display: block;
-      font-size: .8rem;
-      font-weight: 600;
-      margin: 10px 0 4px;
+    .hero-desc{
+      margin:0;
+      font-size: 13px;
+      color: #2b2b2b;
+      text-align:center;
+      line-height: 1.55;
+      max-width: 720px;
     }
 
-    .input-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+    /* ===== カード ===== */
+    .card{
+      background: var(--card);
+      border: 1px solid var(--cardBorder);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 16px 14px;
+      margin-bottom: 14px;
+    }
+
+    .card h2{
+      margin:0 0 10px;
+      font-size: 16px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+
+    .hint{
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    label{
+      display:block;
+      margin-top: 10px;
+      font-size: 12px;
+      font-weight: 800;
     }
 
     input[type="text"],
     input[type="url"],
+    input[type="number"],
     select,
-    textarea {
-      width: 100%;
-      padding: 8px 10px;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-      font-size: .9rem;
-      font-family: inherit;
+    textarea{
+      width:100%;
+      padding: 10px 10px;
+      border-radius: 10px;
+      border:1px solid var(--btnBorder);
+      background:#fff;
+      font-size: 14px;
+      outline:none;
     }
 
-    textarea {
-      min-height: 56px;
-      resize: vertical;
+    textarea{ min-height: 60px; resize:vertical; }
+
+    ::placeholder{ color:#b6b6b6; } /* 薄いグレー */
+
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
     }
 
-    .pill-note {
-      font-size: .75rem;
-      color: var(--text-sub);
-      margin-top: 4px;
+    /* 到着予定：絶対に1行にする */
+    .eta-row{
+      display:flex;
+      gap:10px;
+      flex-wrap:nowrap;
+      align-items:center;
+    }
+    .eta-row select{
+      width: 160px;
+      flex: 0 0 auto;
+    }
+    .eta-row .eta-note{
+      white-space:nowrap;
+      font-size: 12px;
+      color: var(--muted);
     }
 
-    .btn-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+    /* ボタン */
+    .btn-row{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
       margin-top: 12px;
     }
 
-    button {
-      border: none;
+    button{
       border-radius: 999px;
-      padding: 8px 14px;
-      font-size: .85rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      background: #eee;
-      color: var(--text-main);
+      padding: 9px 14px;
+      border:1px solid var(--btnBorder);
+      background: var(--btnBg);
+      cursor:pointer;
+      font-weight: 800;
+      font-size: 13px;
     }
+    button:hover{ background: var(--btnHover); }
 
-    button.btn-primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-      color: #fff;
+    .btn-primary{
+      border: none;
+      background: #2563eb;
+      color:#fff;
     }
+    .btn-primary:hover{ background:#1d4ed8; }
 
-    button.btn-secondary {
-      background: #ffffff;
-      border: 1px solid #ddd;
-    }
-
-    button.btn-danger {
-      background: var(--danger);
-      color: #fff;
-    }
-
-    button:disabled {
-      opacity: .5;
-      cursor: default;
-    }
-
-    /* 行き先リスト */
-
-    #plan-title-display {
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 8px;
-      color: var(--accent-dark);
-    }
-
-    .dest-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 8px;
-    }
-
-    .dest-item {
-      background: var(--item-bg);
+    /* ===== オートコンプリート ===== */
+    .ac-wrap{ position:relative; }
+    .ac-panel{
+      position:absolute;
+      left:0; right:0;
+      top: calc(100% + 6px);
+      background:#fff;
+      border:1px solid var(--btnBorder);
       border-radius: 12px;
-      padding: 10px 10px 8px;
-      border: 1px dashed #f0ce77;
-      position: relative;
+      box-shadow: 0 10px 24px rgba(0,0,0,.12);
+      max-height: 280px;
+      overflow:auto;
+      display:none;
+      z-index: 1000;
+    }
+    .ac-item{
+      padding: 10px 10px;
+      border-bottom: 1px solid #f3f4f6;
+      cursor:pointer;
+      font-size: 13px;
+    }
+    .ac-item:last-child{ border-bottom:none; }
+    .ac-item:hover{ background:#f9fafb; }
+    .ac-main{ font-weight: 900; }
+    .ac-sub{ margin-top:2px; font-size: 12px; color: var(--muted); }
+
+    /* ===== リスト ===== */
+    .plan-title-big{
+      font-size: 22px;     /* もっと大きく */
+      font-weight: 900;
+      margin: 0 0 10px;
+      color:#111827;
     }
 
-    .dest-main {
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
+    .list{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
     }
 
-    .dest-info {
-      flex: 1;
+    .item{
+      background: var(--item);         /* 白 */
+      border-radius: 14px;
+      border: 1px dashed rgba(242, 215, 122, .9);
+      padding: 10px 10px 9px;
     }
 
-    .dest-time {
-      font-weight: 700;
-      font-size: .95rem;
+    .item[draggable="true"]{
+      user-select:none;
+    }
+
+    .item-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 10px;
+    }
+
+    .item-main{
+      flex:1;
+      min-width: 0;
+    }
+
+    /* 時刻 → 行先 の順（自然） */
+    .time{
+      font-size: 16px;
+      font-weight: 900;
+      color:#111827;
       margin-bottom: 2px;
-      white-space: nowrap;
     }
 
-    .dest-title {
-      font-size: .9rem;
-      font-weight: 600;
-      margin-bottom: 2px;
+    .spot{
+      font-size: 14px;
+      font-weight: 900;
+      color:#374151; /* 行先リストの文字をグレー寄り */
+      margin-bottom: 4px;
+      word-break: break-word;
     }
 
-    .dest-links {
-      font-size: .8rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px 10px;
+    .links{
+      display:flex;
+      flex-wrap:wrap;
+      gap: 8px 12px;
       margin-top: 2px;
     }
-
-    .dest-links a {
-      color: var(--link-blue);
-      text-decoration: none;
-      border-bottom: 1px dotted rgba(0, 119, 204, .4);
+    .links a{
+      color: var(--link);
+      text-decoration:none;
+      border-bottom: 1px dotted rgba(29, 78, 216, .45);
+      font-size: 13px;
+      font-weight: 800;
     }
 
-    .dest-meta {
-      font-size: .75rem;
-      color: var(--text-sub);
-      margin-top: 4px;
-    }
-
-    .dest-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      align-items: flex-end;
-      font-size: .75rem;
-      margin-left: 4px;
-    }
-
-    .dest-actions button {
-      padding: 4px 8px;
-      border-radius: 999px;
-      font-size: .75rem;
-      background: #fafafa;
-      border: 1px solid #ddd;
-    }
-
-    .dest-actions .move-row {
-      display: flex;
-      gap: 4px;
-    }
-
-    .helper-text {
-      font-size: .75rem;
-      color: var(--text-sub);
+    .meta{
       margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height:1.4;
+      word-break: break-word;
     }
+
+    /* 操作：横並び（余計なスペース削減） */
+    .actions{
+      display:flex;
+      flex-direction: row;
+      gap: 6px;
+      flex-wrap: nowrap;
+      align-items:center;
+      white-space:nowrap;
+    }
+
+    .action-btn{
+      padding: 6px 10px;
+      border-radius: 999px;
+      border:1px solid var(--btnBorder);
+      background:#fff;
+      font-weight: 900;
+      font-size: 12px;
+      line-height:1;
+      color:#333;           /* 削除も含めて統一（白文字にしない） */
+    }
+    .action-btn:hover{ background: var(--btnHover); }
 
     /* 共有 */
-
-    .share-buttons button {
-      flex: 1;
-      min-width: 180px;
-      justify-content: center;
+    .share-note{
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height:1.45;
     }
 
-    .share-note {
-      font-size: .75rem;
-      color: var(--text-sub);
-      margin-top: 6px;
-    }
-
-    /* トースト */
-
-    .toast {
+    .toast{
       position: fixed;
       left: 50%;
       bottom: 18px;
       transform: translateX(-50%);
-      background: rgba(0,0,0,0.82);
+      padding: 8px 14px;
+      background: rgba(0,0,0,.82);
       color: #fff;
-      padding: 8px 16px;
       border-radius: 999px;
-      font-size: .8rem;
+      font-size: 13px;
       opacity: 0;
-      pointer-events: none;
+      pointer-events:none;
       transition: opacity .2s ease;
-      z-index: 3000;
-      white-space: nowrap;
+      z-index: 5000;
     }
+    .toast.show{ opacity: 1; }
 
-    .toast.show {
-      opacity: 1;
-    }
+    /* 折りたたみ（共有リンクから開いた時、フォームを畳む） */
+    .collapsed{ display:none; }
 
-    @media (max-width: 640px) {
-      header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
-      }
-      .logo-badge {
-        font-size: 1rem;
-      }
-      header h1 {
-        font-size: .95rem;
-      }
-      .card {
-        padding: 14px 10px 16px;
-        border-radius: 14px;
-      }
-      .dest-main {
-        flex-direction: row;
-      }
-      .dest-actions {
-        flex-direction: column;
-      }
+    @media (max-width: 640px){
+      .tabimemo-title{ font-size: 30px; }
+      .card{ padding: 14px 12px; border-radius: 16px; }
+      input, select, textarea{ font-size: 16px; } /* スマホ小ささ対策 */
+      .plan-title-big{ font-size: 22px; }
+      .time{ font-size: 17px; }
+      .spot{ font-size: 15px; }
+      .actions{ gap: 6px; }
+      .action-btn{ padding: 6px 10px; font-size: 12px; }
+      /* ETA 1行維持（狭い場合だけ折返し許可） */
+      .eta-row{ flex-wrap:wrap; }
+      .eta-row select{ width: 48%; min-width: 140px; }
+      .eta-row .eta-note{ width: 100%; white-space:normal; }
     }
   </style>
 </head>
+
 <body>
-  <div class="wrapper">
-    <header>
-      <div class="logo-badge">TABI<span>MEMO</span></div>
-      <div>
-        <h1>旅のルートや行程を一括管理して皆で共有</h1>
-        <p>旅先や移動中に「次どこ行く？」と検索する時間をゼロにしたい。シンプルな行程メモ＋共有ツールです。</p>
+  <div class="wrap">
+
+    <!-- ヘッダー -->
+    <div class="hero">
+      <div class="tabimemo-badge">
+        <h1 class="tabimemo-title">TABIMEMO</h1>
       </div>
-    </header>
+      <p class="hero-subtitle">〜旅のルートや行程を一括管理して皆で共有〜</p>
+      <p class="hero-desc">
+        旅先や移動中に次の行先を検索する必要をなくしたい！<br>
+        旅や一日の移動行程をシンプルに見やすくを追求しました！
+      </p>
+    </div>
 
-    <!-- ① 基本情報 -->
+    <!-- ① 旅の基本情報 -->
     <section class="card" id="section-basic">
-      <h2><span class="num">①</span>旅の基本情報</h2>
-      <label for="planTitle">旅のタイトル（例：四国一周サーフトリップ 鳴門〜FW1日目）</label>
-      <input id="planTitle" type="text" placeholder="例：神山の農業をつくるFW" />
-
-      <p class="pill-note">※ タイトルは共有時に大きく表示されます。未入力の場合は「プランタイトル未設定」と表示されます。</p>
+      <h2>① 旅の基本情報</h2>
+      <label for="planTitle">旅のタイトル</label>
+      <input id="planTitle" type="text" placeholder="例：四国一周サーフトリップ／営業訪問ルート（東京）／徳島FW 1日目" />
+      <div class="hint">※ 共有先ではタイトルが一番上に大きく表示されます。</div>
     </section>
 
     <!-- ② 行き先追加 -->
     <section class="card" id="section-add">
-      <h2><span class="num">②</span>行き先を追加</h2>
-      <p class="section-title-sub">スポット名・時間・移動手段・URL などを入力してリストに追加します。</p>
+      <h2>② 行き先を追加</h2>
 
-      <label for="spotName">行き先の名前（例：1日目ホテル ひろめ市場 A社 本社ビル）</label>
-      <input id="spotName" type="text" placeholder="スポット名・訪問先名を入力" />
-
-      <label>Googleマップで場所を検索（TABIMEMO内で完結）</label>
-      <div class="input-row">
-        <input id="gmSearchInput" type="text" placeholder="例：四国大学 神山温泉、渓谷の名前などを入力して候補から選択" />
-        <button type="button" id="gmSearchButton" class="btn-secondary">候補を検索</button>
+      <label for="spotName">行き先（入力すると候補が出ます）</label>
+      <div class="ac-wrap">
+        <input id="spotName" type="text" autocomplete="off"
+          placeholder="例：品川駅／名古屋城／A社 本社／ホテル日航／道の駅 なると" />
+        <div id="acPanel" class="ac-panel"></div>
       </div>
-      <p class="pill-note">候補を選択すると「行き先URLを自動で取得（Googleマップの共有リンク）」が自動で入力されます。</p>
-      <div id="gmSearchResults" class="pill-note"></div>
-
-      <label for="placeUrl">行き先URL（Googleマップや各種リンク）</label>
-      <input id="placeUrl" type="url" placeholder="https://maps.google.com/…／その他URLもOK" />
-
-      <label for="webUrl">WebサイトURL（任意：公式HP・予約ページ・資料など）</label>
-      <input id="webUrl" type="url" placeholder="例：公式サイト、イベントページ、YouTube、PDF など" />
+      <div class="hint">※ 候補を選ぶと GoogleマップURL が自動でセットされます（画面を離れません）。</div>
 
       <label>到着予定時間（任意）</label>
-      <div class="input-row">
+      <div class="eta-row">
         <select id="etaHour">
-          <option value="">時間を選択</option>
+          <option value="">時間（未設定）</option>
         </select>
         <select id="etaMinute">
-          <option value="">分を選択（未選択なら00分）</option>
+          <option value="">分（未選択なら00）</option>
         </select>
+        <div class="eta-note">例：10:00 / 13:30</div>
       </div>
-      <p class="pill-note">例）10:00, 13:30 のように時刻を入力。時間だけ選んだ場合は「00分」として扱います。</p>
 
       <label for="transport">前の地点からの移動手段</label>
       <select id="transport">
@@ -391,7 +420,6 @@
         <option value="徒歩">徒歩</option>
         <option value="自転車">自転車</option>
         <option value="車">車</option>
-        <option value="バイク">バイク</option>
         <option value="電車">電車</option>
         <option value="バス">バス</option>
         <option value="タクシー">タクシー</option>
@@ -400,49 +428,45 @@
       </select>
 
       <label for="travelMinutes">前の地点からの移動時間（分）</label>
-      <input id="travelMinutes" type="number" min="0" step="5" placeholder="例：25（Googleマップの経路検索の値をそのまま入力）" />
+      <input id="travelMinutes" type="number" min="0" placeholder="例：25（Googleマップの結果をそのまま）" />
+
+      <label for="otherLink">その他リンク（任意：公式HP、予約、資料など）</label>
+      <input id="otherLink" type="url" placeholder="例：https://example.com（複数ある場合はメモ欄に追記でもOK）" />
 
       <label for="note">メモ（任意）</label>
-      <textarea id="note" placeholder="集合場所、注意点、持ち物など"></textarea>
+      <textarea id="note" placeholder="例：集合は南改札／駐車場は西側／チケット要予約 など"></textarea>
 
       <div class="btn-row">
-        <button type="button" id="addButton" class="btn-primary">リストに追加</button>
-        <button type="button" id="clearButton" class="btn-secondary">入力をクリア</button>
+        <button id="addBtn" class="btn-primary" type="button">リストに追加</button>
+        <button id="clearBtn" type="button">入力をクリア</button>
       </div>
-      <p class="pill-note">※ 編集モードの時は「リストに追加」が「行き先を更新」に変わります。</p>
+      <div class="hint">※ 編集中は「リストに追加」が「更新」に変わります。</div>
     </section>
 
-    <!-- ② 行き先リスト表示 -->
+    <!-- ③ 行き先リスト -->
     <section class="card" id="section-list">
-      <h2><span class="num">②</span>行き先リスト＆順番</h2>
-      <div id="plan-title-display">プランタイトル：<span id="plan-title-text">未設定</span></div>
-
-      <div id="destList" class="dest-list"></div>
-
-      <p class="helper-text">・並び順がそのままルート順（1 → 2 → 3…）になります。<br>
-        ・「↑」「↓」ボタン、またはドラッグ＆ドロップで順番を変えられます。</p>
+      <h2>③ 行き先リスト</h2>
+      <div id="planTitleBig" class="plan-title-big">プランタイトル未設定</div>
+      <div id="list" class="list"></div>
+      <div class="hint">・ドラッグで並び替えできます。・↑↓ 編集 削除も使えます。</div>
     </section>
 
-    <!-- ③ 仲間と共有 -->
+    <!-- ④ 共有 -->
     <section class="card" id="section-share">
-      <h2><span class="num">③</span>仲間と共有</h2>
-      <div class="share-buttons btn-row">
-        <button type="button" id="longShareButton" class="btn-secondary">
-          長い共有リンクを作成（どの端末でも再現可）
-        </button>
-      </div>
-      <p class="share-note">
-        ・長いリンク：URL に旅データ全部を埋め込むので、どこに送っても再現できます（かなり長くなります）。<br>
-        ・短いリンク：TABIMEMO に旅データを保存し、短いURL（id=XXXX形式）のURLで呼び出します。<br>
-        ・どちらの場合も、クリックだけでクリップボードにコピーされます。
-      </p>
+      <h2>④ 仲間と共有</h2>
 
-      <div class="share-buttons btn-row" style="margin-top:10px;">
-        <button type="button" id="shortShareButton" class="btn-primary">
-          短いリンクを作成（この端末以外でも再現可・推奨）
-        </button>
+      <div class="btn-row">
+        <button id="shortShareBtn" class="btn-primary" type="button">短い共有リンクを作成（推奨）</button>
+        <button id="longShareBtn" type="button">長い共有リンクを作成（どこでも再現）</button>
+      </div>
+
+      <div class="share-note">
+        ・ボタンを押すとクリップボードにコピーされます。<br>
+        ・短いリンク：Firestoreに保存して共有（スマホ/PCどちらでもOK）<br>
+        ・長いリンク：データをURLに埋め込み（長くなります）
       </div>
     </section>
+
   </div>
 
   <div id="toast" class="toast"></div>
@@ -451,13 +475,15 @@
   <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 
-  <!-- Google Maps Places API（APIキーを差し替えてください） -->
+  <!-- Google Maps Places API（ここだけ差し替え） -->
   <script
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBp3cXlnetWCkLe0NJBMm_PIfZ42MMvUrE&libraries=places"
     async defer></script>
 
   <script>
-    // ===== Firebase 設定 =====
+    /***********************
+     * Firebase Config（提供いただいたもの）
+     ***********************/
     const firebaseConfig = {
       apiKey: "AIzaSyBAB8cAmmnn0VgAmlCO0M6xKcvP7uAWi64",
       authDomain: "tabimemo-842cb.firebaseapp.com",
@@ -470,430 +496,564 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    const plansCollection = db.collection("tabimemoPlans");
+    const plansCol = db.collection("tabimemoPlans"); // 統一
 
-    // ===== アプリ状態 =====
+    /***********************
+     * State
+     ***********************/
     let destinations = [];
     let editingIndex = null;
-    let currentPlanId = null;
+    let selectedPlace = null; // {name, placeId, mapUrl}
+    let autocompleteService = null;
+    let placesService = null;
 
-    // ===== DOM 要素 =====
-    const planTitleInput = document.getElementById("planTitle");
-    const planTitleText = document.getElementById("plan-title-text");
-    const spotNameInput = document.getElementById("spotName");
-    const gmSearchInput = document.getElementById("gmSearchInput");
-    const gmSearchButton = document.getElementById("gmSearchButton");
-    const gmSearchResults = document.getElementById("gmSearchResults");
-    const placeUrlInput = document.getElementById("placeUrl");
-    const webUrlInput = document.getElementById("webUrl");
-    const etaHourSelect = document.getElementById("etaHour");
-    const etaMinuteSelect = document.getElementById("etaMinute");
-    const transportSelect = document.getElementById("transport");
-    const travelMinutesInput = document.getElementById("travelMinutes");
-    const noteInput = document.getElementById("note");
-    const addButton = document.getElementById("addButton");
-    const clearButton = document.getElementById("clearButton");
-    const destListEl = document.getElementById("destList");
-    const longShareButton = document.getElementById("longShareButton");
-    const shortShareButton = document.getElementById("shortShareButton");
-    const toastEl = document.getElementById("toast");
+    /***********************
+     * DOM
+     ***********************/
+    const toastEl = document.getElementById('toast');
+    const planTitleInput = document.getElementById('planTitle');
+    const planTitleBig = document.getElementById('planTitleBig');
 
-    // ===== ユーティリティ =====
-    function showToast(message) {
-      toastEl.textContent = message;
-      toastEl.classList.add("show");
-      setTimeout(() => toastEl.classList.remove("show"), 2000);
+    const spotNameInput = document.getElementById('spotName');
+    const acPanel = document.getElementById('acPanel');
+
+    const etaHour = document.getElementById('etaHour');
+    const etaMinute = document.getElementById('etaMinute');
+    const transport = document.getElementById('transport');
+    const travelMinutes = document.getElementById('travelMinutes');
+    const otherLink = document.getElementById('otherLink');
+    const note = document.getElementById('note');
+
+    const addBtn = document.getElementById('addBtn');
+    const clearBtn = document.getElementById('clearBtn');
+
+    const listEl = document.getElementById('list');
+
+    const shortShareBtn = document.getElementById('shortShareBtn');
+    const longShareBtn = document.getElementById('longShareBtn');
+
+    const sectionBasic = document.getElementById('section-basic');
+    const sectionAdd = document.getElementById('section-add');
+
+    /***********************
+     * Utils
+     ***********************/
+    function showToast(msg){
+      toastEl.textContent = msg;
+      toastEl.classList.add('show');
+      setTimeout(() => toastEl.classList.remove('show'), 1800);
     }
 
-    function copyToClipboard(text) {
-      navigator.clipboard?.writeText(text).then(() => {
-        showToast("リンクをコピーしました");
-      }).catch(() => {
-        showToast("コピーに失敗しました");
-      });
+    async function copyText(text){
+      try{
+        await navigator.clipboard.writeText(text);
+        showToast('リンクをコピーしました');
+      }catch{
+        showToast('コピーに失敗しました');
+      }
     }
 
-    function encodePlanData(data) {
+    function safeTrim(v){ return (v || '').toString().trim(); }
+
+    function getEta(){
+      const h = etaHour.value;
+      if(!h) return '';                 // 時間未選択なら未設定
+      const m = etaMinute.value || '00'; // 分未選択でも :00
+      return `${h}:${m}`;
+    }
+
+    function setEta(eta){
+      if(!eta){
+        etaHour.value = '';
+        etaMinute.value = '';
+        return;
+      }
+      const [h, m] = eta.split(':');
+      etaHour.value = h || '';
+      etaMinute.value = m || '';
+    }
+
+    function shortenUrl(u){
+      try{
+        const url = new URL(u);
+        const host = url.hostname.replace(/^www\./,'');
+        // なるべく短く：host + パス先頭だけ
+        const path = url.pathname && url.pathname !== '/' ? url.pathname.split('/').filter(Boolean)[0] : '';
+        return path ? `${host}/${path}…` : host;
+      }catch{
+        return u.length > 28 ? u.slice(0, 26) + '…' : u;
+      }
+    }
+
+    function encodePlan(data){
       const json = JSON.stringify(data);
-      return encodeURIComponent(btoa(unescape(encodeURIComponent(json))));
+      // unicode safe base64
+      const b64 = btoa(unescape(encodeURIComponent(json)));
+      return encodeURIComponent(b64);
     }
 
-    function decodePlanData(encoded) {
-      try {
-        const json = decodeURIComponent(escape(atob(decodeURIComponent(encoded))));
+    function decodePlan(param){
+      try{
+        const json = decodeURIComponent(escape(atob(decodeURIComponent(param))));
         return JSON.parse(json);
-      } catch (e) {
+      }catch(e){
         console.error(e);
         return null;
       }
     }
 
-    function formatTime(eta) {
-      if (!eta) return "";
-      return eta;
+    function currentPlanPayload(){
+      return {
+        title: safeTrim(planTitleInput.value),
+        destinations
+      };
     }
 
-    // ===== 時刻プルダウン初期化 =====
-    function initTimeSelectors() {
-      for (let h = 0; h < 24; h++) {
-        const v = String(h).padStart(2, "0");
-        const opt = document.createElement("option");
+    function updateTitleBig(){
+      planTitleBig.textContent = safeTrim(planTitleInput.value) || 'プランタイトル未設定';
+    }
+
+    /***********************
+     * Time selectors init
+     * - 分は 1分刻み
+     ***********************/
+    function initTimeSelectors(){
+      for(let h=0; h<24; h++){
+        const v = String(h).padStart(2,'0');
+        const opt = document.createElement('option');
         opt.value = v;
-        opt.textContent = `${v} 時`;
-        etaHourSelect.appendChild(opt);
+        opt.textContent = `${v}時`;
+        etaHour.appendChild(opt);
       }
-      for (let m = 0; m < 60; m += 5) {
-        const v = String(m).padStart(2, "0");
-        const opt = document.createElement("option");
+      for(let m=0; m<60; m++){
+        const v = String(m).padStart(2,'0');
+        const opt = document.createElement('option');
         opt.value = v;
-        opt.textContent = `${v} 分`;
-        etaMinuteSelect.appendChild(opt);
+        opt.textContent = `${v}分`;
+        etaMinute.appendChild(opt);
       }
     }
 
-    // ===== 行き先リスト描画 =====
-    function renderList() {
-      planTitleText.textContent = planTitleInput.value.trim() || "プランタイトル未設定";
-      destListEl.innerHTML = "";
-
-      destinations.forEach((d, index) => {
-        const item = document.createElement("div");
-        item.className = "dest-item";
-        item.setAttribute("draggable", "true");
-        item.dataset.index = index;
-
-        const main = document.createElement("div");
-        main.className = "dest-main";
-
-        const info = document.createElement("div");
-        info.className = "dest-info";
-
-        const timeEl = document.createElement("div");
-        timeEl.className = "dest-time";
-        timeEl.textContent = d.eta || "時間未設定";
-
-        const titleEl = document.createElement("div");
-        titleEl.className = "dest-title";
-        titleEl.textContent = d.title || "名称未設定";
-
-        const linksEl = document.createElement("div");
-        linksEl.className = "dest-links";
-        if (d.url) {
-          const a = document.createElement("a");
-          a.href = d.url;
-          a.target = "_blank";
-          a.rel = "noopener";
-          a.textContent = "Googleマップで確認";
-          linksEl.appendChild(a);
+    /***********************
+     * Places: init
+     ***********************/
+    function ensurePlaces(){
+      if(window.google && google.maps && google.maps.places){
+        if(!autocompleteService){
+          autocompleteService = new google.maps.places.AutocompleteService();
         }
-        if (d.webUrl) {
-          const a2 = document.createElement("a");
-          a2.href = d.webUrl;
-          a2.target = "_blank";
-          a2.rel = "noopener";
-          a2.textContent = "公式サイトを見る";
-          linksEl.appendChild(a2);
+        if(!placesService){
+          const dummy = document.createElement('div');
+          placesService = new google.maps.places.PlacesService(dummy);
         }
+        return true;
+      }
+      return false;
+    }
 
-        const metaEl = document.createElement("div");
-        metaEl.className = "dest-meta";
-        const parts = [];
-        if (d.transport) parts.push(`移動手段：${d.transport}`);
-        if (d.travelMinutes) parts.push(`前の地点から約 ${d.travelMinutes} 分`);
-        if (d.note) parts.push(`メモ：${d.note}`);
-        metaEl.textContent = parts.join(" ／ ");
+    function closePanel(){
+      acPanel.style.display = 'none';
+      acPanel.innerHTML = '';
+    }
 
-        info.appendChild(timeEl);
-        info.appendChild(titleEl);
-        if (linksEl.children.length) info.appendChild(linksEl);
-        if (parts.length) info.appendChild(metaEl);
+    function openPanel(){
+      acPanel.style.display = 'block';
+    }
 
-        const actions = document.createElement("div");
-        actions.className = "dest-actions";
-
-        const moveRow = document.createElement("div");
-        moveRow.className = "move-row";
-
-        const upBtn = document.createElement("button");
-        upBtn.textContent = "↑";
-        upBtn.addEventListener("click", () => moveItem(index, -1));
-
-        const downBtn = document.createElement("button");
-        downBtn.textContent = "↓";
-        downBtn.addEventListener("click", () => moveItem(index, 1));
-
-        moveRow.appendChild(upBtn);
-        moveRow.appendChild(downBtn);
-
-        const editBtn = document.createElement("button");
-        editBtn.textContent = "編集";
-        editBtn.addEventListener("click", () => startEdit(index));
-
-        const delBtn = document.createElement("button");
-        delBtn.textContent = "削除";
-        delBtn.classList.add("btn-danger");
-        delBtn.addEventListener("click", () => deleteItem(index));
-
-        actions.appendChild(moveRow);
-        actions.appendChild(editBtn);
-        actions.appendChild(delBtn);
-
-        main.appendChild(info);
-        main.appendChild(actions);
-        item.appendChild(main);
-        destListEl.appendChild(item);
+    function renderPredictions(predictions){
+      acPanel.innerHTML = '';
+      if(!predictions || predictions.length === 0){
+        closePanel();
+        return;
+      }
+      predictions.slice(0,6).forEach(p => {
+        const item = document.createElement('div');
+        item.className = 'ac-item';
+        item.innerHTML = `
+          <div class="ac-main">${escapeHtml(p.structured_formatting?.main_text || p.description)}</div>
+          <div class="ac-sub">${escapeHtml(p.structured_formatting?.secondary_text || '')}</div>
+        `;
+        item.addEventListener('click', () => choosePrediction(p));
+        acPanel.appendChild(item);
       });
-
-      initDragAndDrop();
+      openPanel();
     }
 
-    function moveItem(index, delta) {
-      const newIndex = index + delta;
-      if (newIndex < 0 || newIndex >= destinations.length) return;
-      const [item] = destinations.splice(index, 1);
-      destinations.splice(newIndex, 0, item);
-      renderList();
+    function choosePrediction(pred){
+      closePanel();
+
+      const name = pred.structured_formatting?.main_text || pred.description || '';
+      spotNameInput.value = name;
+      selectedPlace = { name, placeId: pred.place_id, mapUrl: `https://www.google.com/maps/place/?q=place_id:${pred.place_id}` };
+
+      // place details を取りたい場合に備え（今回はURL生成だけで十分）
+      showToast('GoogleマップURLを自動セットしました');
     }
 
-    function startEdit(index) {
-      const d = destinations[index];
-      editingIndex = index;
-      spotNameInput.value = d.title || "";
-      placeUrlInput.value = d.url || "";
-      webUrlInput.value = d.webUrl || "";
-      noteInput.value = d.note || "";
-      transportSelect.value = d.transport || "";
-      travelMinutesInput.value = d.travelMinutes || "";
-      if (d.eta) {
-        const [h, m] = d.eta.split(":");
-        etaHourSelect.value = h;
-        etaMinuteSelect.value = m;
-      } else {
-        etaHourSelect.value = "";
-        etaMinuteSelect.value = "";
+    function escapeHtml(s){
+      return (s || '').replace(/[&<>"']/g, c => (
+        { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]
+      ));
+    }
+
+    let predTimer = null;
+    spotNameInput.addEventListener('input', () => {
+      selectedPlace = null; // 入力が変わったら再選択が必要
+      const q = safeTrim(spotNameInput.value);
+      if(q.length < 2){
+        closePanel();
+        return;
       }
-      addButton.textContent = "行き先を更新";
-      showToast("編集モードになりました");
-      document.getElementById("section-add").scrollIntoView({ behavior: "smooth" });
+      if(!ensurePlaces()){
+        // Google JS がまだ読み込み中の可能性
+        return;
+      }
+
+      clearTimeout(predTimer);
+      predTimer = setTimeout(() => {
+        autocompleteService.getPlacePredictions(
+          { input: q, language:'ja', region:'jp' },
+          (predictions, status) => {
+            if(status !== google.maps.places.PlacesServiceStatus.OK){
+              closePanel();
+              return;
+            }
+            renderPredictions(predictions);
+          }
+        );
+      }, 180);
+    });
+
+    // パネル外クリックで閉じる
+    document.addEventListener('click', (e) => {
+      if(!acPanel.contains(e.target) && e.target !== spotNameInput){
+        closePanel();
+      }
+    });
+
+    /***********************
+     * Add / Edit
+     ***********************/
+    function clearForm(){
+      spotNameInput.value = '';
+      selectedPlace = null;
+      setEta('');
+      transport.value = '';
+      travelMinutes.value = '';
+      otherLink.value = '';
+      note.value = '';
+      editingIndex = null;
+      addBtn.textContent = 'リストに追加';
+      closePanel();
     }
 
-    function deleteItem(index) {
-      if (!confirm("この行き先を削除しますか？")) return;
-      destinations.splice(index, 1);
+    function startEdit(i){
+      const d = destinations[i];
+      editingIndex = i;
+
+      spotNameInput.value = d.title || '';
+      // 既存データの mapUrl があれば、そのまま保持（再選択しなくても良い）
+      selectedPlace = d.mapUrl ? { name: d.title || '', placeId: d.placeId || '', mapUrl: d.mapUrl } : null;
+
+      setEta(d.eta || '');
+      transport.value = d.transport || '';
+      travelMinutes.value = (d.travelMinutes ?? '') === null ? '' : (d.travelMinutes ?? '');
+      otherLink.value = d.otherLink || '';
+      note.value = d.note || '';
+
+      addBtn.textContent = '更新';
+      showToast('編集モード');
+      sectionAdd.scrollIntoView({ behavior:'smooth' });
+    }
+
+    function deleteItem(i){
+      if(!confirm('この行き先を削除しますか？')) return;
+      destinations.splice(i, 1);
       renderList();
     }
 
-    function clearForm() {
-      spotNameInput.value = "";
-      placeUrlInput.value = "";
-      webUrlInput.value = "";
-      noteInput.value = "";
-      transportSelect.value = "";
-      travelMinutesInput.value = "";
-      etaHourSelect.value = "";
-      etaMinuteSelect.value = "";
-      editingIndex = null;
-      addButton.textContent = "リストに追加";
+    function moveItem(i, delta){
+      const ni = i + delta;
+      if(ni < 0 || ni >= destinations.length) return;
+      const [x] = destinations.splice(i,1);
+      destinations.splice(ni,0,x);
+      renderList();
     }
 
-    function getEtaFromSelectors() {
-      const h = etaHourSelect.value;
-      const m = etaMinuteSelect.value || "00";
-      if (!h) return "";
-      return `${h}:${m}`;
-    }
+    function addOrUpdate(){
+      const title = safeTrim(spotNameInput.value);
+      if(!title){
+        alert('行き先を入力してください。');
+        return;
+      }
 
-    function onAddOrUpdate() {
-      const eta = getEtaFromSelectors();
-      const title = spotNameInput.value.trim();
-      const url = placeUrlInput.value.trim();
-      const webUrl = webUrlInput.value.trim();
-      const note = noteInput.value.trim();
-      const transport = transportSelect.value;
-      const travelMinutes = travelMinutesInput.value ? Number(travelMinutesInput.value) : "";
+      const eta = getEta();
+      const mapUrl = selectedPlace?.mapUrl || '';   // 候補から選んだ場合に入る
+      const placeId = selectedPlace?.placeId || '';
 
-      const data = { eta, title, url, webUrl, note, transport, travelMinutes };
+      const data = {
+        eta,
+        title,
+        mapUrl,
+        placeId,
+        transport: safeTrim(transport.value),
+        travelMinutes: travelMinutes.value === '' ? '' : Number(travelMinutes.value),
+        otherLink: safeTrim(otherLink.value),
+        note: safeTrim(note.value)
+      };
 
-      if (editingIndex != null) {
+      if(editingIndex !== null){
         destinations[editingIndex] = data;
-      } else {
+      }else{
         destinations.push(data);
       }
 
-      renderList();
       clearForm();
+      renderList();
     }
 
-    addButton.addEventListener("click", onAddOrUpdate);
-    clearButton.addEventListener("click", clearForm);
+    addBtn.addEventListener('click', addOrUpdate);
+    clearBtn.addEventListener('click', clearForm);
+    planTitleInput.addEventListener('input', updateTitleBig);
 
-    // ===== ドラッグ＆ドロップ =====
-    function initDragAndDrop() {
-      const items = destListEl.querySelectorAll(".dest-item");
-      let dragIndex = null;
+    /***********************
+     * Render list
+     ***********************/
+    function renderList(){
+      updateTitleBig();
+      listEl.innerHTML = '';
 
-      items.forEach(item => {
-        item.addEventListener("dragstart", (e) => {
-          dragIndex = Number(item.dataset.index);
-          e.dataTransfer.effectAllowed = "move";
-          e.dataTransfer.setData("text/plain", dragIndex);
+      destinations.forEach((d, i) => {
+        const item = document.createElement('div');
+        item.className = 'item';
+        item.draggable = true;
+        item.dataset.index = String(i);
+
+        const main = document.createElement('div');
+        main.className = 'item-top';
+
+        const left = document.createElement('div');
+        left.className = 'item-main';
+
+        const time = document.createElement('div');
+        time.className = 'time';
+        time.textContent = d.eta ? d.eta : '時間未設定';
+
+        const spot = document.createElement('div');
+        spot.className = 'spot';
+        spot.textContent = d.title || '名称未設定';
+
+        const links = document.createElement('div');
+        links.className = 'links';
+
+        if(d.mapUrl){
+          const a = document.createElement('a');
+          a.href = d.mapUrl;
+          a.target = '_blank';
+          a.rel = 'noopener';
+          a.textContent = 'Googleマップで確認';
+          links.appendChild(a);
+        }
+
+        if(d.otherLink){
+          const a2 = document.createElement('a');
+          a2.href = d.otherLink;
+          a2.target = '_blank';
+          a2.rel = 'noopener';
+          a2.textContent = `その他リンク（${shortenUrl(d.otherLink)}）`;
+          links.appendChild(a2);
+        }
+
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        const parts = [];
+        if(d.transport) parts.push(`移動：${d.transport}`);
+        if(d.travelMinutes !== '' && d.travelMinutes !== null && d.travelMinutes !== undefined) parts.push(`所要：約${d.travelMinutes}分`);
+        if(d.note) parts.push(`メモ：${d.note}`);
+        meta.textContent = parts.join(' ／ ');
+
+        left.appendChild(time);
+        left.appendChild(spot);
+        if(links.children.length) left.appendChild(links);
+        if(parts.length) left.appendChild(meta);
+
+        const actions = document.createElement('div');
+        actions.className = 'actions';
+
+        const up = document.createElement('button');
+        up.className = 'action-btn';
+        up.textContent = '↑';
+        up.addEventListener('click', () => moveItem(i, -1));
+
+        const down = document.createElement('button');
+        down.className = 'action-btn';
+        down.textContent = '↓';
+        down.addEventListener('click', () => moveItem(i, 1));
+
+        const edit = document.createElement('button');
+        edit.className = 'action-btn';
+        edit.textContent = '編集';
+        edit.addEventListener('click', () => startEdit(i));
+
+        const del = document.createElement('button');
+        del.className = 'action-btn'; // 削除も完全統一
+        del.textContent = '削除';
+        del.addEventListener('click', () => deleteItem(i));
+
+        actions.appendChild(up);
+        actions.appendChild(down);
+        actions.appendChild(edit);
+        actions.appendChild(del);
+
+        main.appendChild(left);
+        main.appendChild(actions);
+        item.appendChild(main);
+        listEl.appendChild(item);
+      });
+
+      initDnD();
+    }
+
+    function initDnD(){
+      const items = listEl.querySelectorAll('.item');
+      let fromIndex = null;
+
+      items.forEach(el => {
+        el.addEventListener('dragstart', (e) => {
+          fromIndex = Number(el.dataset.index);
+          e.dataTransfer.effectAllowed = 'move';
         });
 
-        item.addEventListener("dragover", (e) => {
+        el.addEventListener('dragover', (e) => {
           e.preventDefault();
-          e.dataTransfer.dropEffect = "move";
+          e.dataTransfer.dropEffect = 'move';
         });
 
-        item.addEventListener("drop", (e) => {
+        el.addEventListener('drop', (e) => {
           e.preventDefault();
-          const from = dragIndex;
-          const to = Number(item.dataset.index);
-          if (from === null || from === to) return;
-          const [moved] = destinations.splice(from, 1);
-          destinations.splice(to, 0, moved);
-          dragIndex = null;
+          const toIndex = Number(el.dataset.index);
+          if(fromIndex === null || Number.isNaN(toIndex) || fromIndex === toIndex) return;
+
+          const [moved] = destinations.splice(fromIndex, 1);
+          destinations.splice(toIndex, 0, moved);
+
+          fromIndex = null;
           renderList();
         });
       });
     }
 
-    // ===== 共有（長いリンク） =====
-    function buildPlanPayload() {
-      return {
-        title: planTitleInput.value.trim(),
-        destinations: destinations
-      };
-    }
-
-    longShareButton.addEventListener("click", () => {
-      if (!destinations.length) {
-        showToast("まず行き先を追加してください");
+    /***********************
+     * Share
+     ***********************/
+    longShareBtn.addEventListener('click', async () => {
+      if(destinations.length === 0){
+        alert('行き先を追加してください。');
         return;
       }
-      const payload = buildPlanPayload();
-      const encoded = encodePlanData(payload);
-      const baseUrl = location.origin + location.pathname.replace(/index\.html$/, "");
-      const url = `${baseUrl}?plan=${encoded}`;
-      copyToClipboard(url);
+      const base = location.origin + location.pathname.replace(/index\.html$/,'');
+      const url = `${base}?plan=${encodePlan(currentPlanPayload())}`;
+      await copyText(url);
     });
 
-    // ===== 共有（短いリンク：Firestore） =====
-    shortShareButton.addEventListener("click", async () => {
-      if (!destinations.length) {
-        showToast("まず行き先を追加してください");
+    shortShareBtn.addEventListener('click', async () => {
+      if(destinations.length === 0){
+        alert('行き先を追加してください。');
         return;
       }
-      const payload = buildPlanPayload();
-      try {
-        const docRef = await plansCollection.add({
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          payload
+      try{
+        const payload = currentPlanPayload();
+        const doc = await plansCol.add({
+          title: payload.title || '',
+          destinations: payload.destinations || [],
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        currentPlanId = docRef.id;
-        const baseUrl = location.origin + location.pathname.replace(/index\.html$/, "");
-        const url = `${baseUrl}?p=${currentPlanId}`;
-        copyToClipboard(url);
-      } catch (e) {
+        const base = location.origin + location.pathname.replace(/index\.html$/,'');
+        const url = `${base}?p=${doc.id}`;
+        await copyText(url);
+      }catch(e){
         console.error(e);
-        alert("短いリンクの作成に失敗しました。しばらくしてからお試しください。");
+        alert('短い共有リンクの作成に失敗しました。Firestore設定を確認してください。');
       }
     });
 
-    // ===== URL からの読み込み =====
-    async function loadFromUrl() {
+    /***********************
+     * Load from URL
+     * - plan= (long)
+     * - p= (short Firestore)
+     * - 互換：doc に payload がある形式も読み込む
+     ***********************/
+    async function loadFromUrl(){
       const params = new URLSearchParams(location.search);
-      const planParam = params.get("plan");
-      const pParam = params.get("p");
+      const planParam = params.get('plan');
+      const pParam = params.get('p');
 
-      if (planParam) {
-        const data = decodePlanData(planParam);
-        if (!data) return;
-        applyPlanData(data);
-        setTimeout(() => {
-          document.getElementById("section-list").scrollIntoView({ behavior: "smooth" });
-        }, 300);
-      } else if (pParam) {
-        try {
-          const snap = await plansCollection.doc(pParam).get();
-          if (!snap.exists) {
-            alert("共有されたデータが見つかりませんでした。");
+      if(planParam){
+        const data = decodePlan(planParam);
+        if(data) applyPlanData(data, true);
+        return;
+      }
+
+      if(pParam){
+        try{
+          const snap = await plansCol.doc(pParam).get();
+          if(!snap.exists){
+            alert('共有データが見つかりませんでした。');
             return;
           }
-          const data = snap.data().payload;
-          applyPlanData(data);
-          currentPlanId = pParam;
-          setTimeout(() => {
-            document.getElementById("section-list").scrollIntoView({ behavior: "smooth" });
-          }, 300);
-        } catch (e) {
+          const raw = snap.data() || {};
+          // 新形式：{title, destinations}
+          // 旧互換：{payload:{title, destinations}}
+          const data = raw.payload && typeof raw.payload === 'object' ? raw.payload : raw;
+          applyPlanData(data, true);
+        }catch(e){
           console.error(e);
-          alert("共有データの読み込みに失敗しました。");
+          alert('共有データの読み込みに失敗しました。');
         }
       }
     }
 
-    function applyPlanData(data) {
-      planTitleInput.value = data.title || "";
-      destinations = Array.isArray(data.destinations) ? data.destinations : [];
-      renderList();
-    }
-
-    // ===== Google Places API 検索 =====
-    let placesService = null;
-
-    function ensurePlacesService() {
-      if (!placesService && window.google && google.maps && google.maps.places) {
-        const dummyMap = document.createElement("div");
-        placesService = new google.maps.places.PlacesService(dummyMap);
-      }
-      return placesService;
-    }
-
-    gmSearchButton.addEventListener("click", () => {
-      const keyword = gmSearchInput.value.trim();
-      if (!keyword) {
-        showToast("検索ワードを入力してください");
-        return;
-      }
-      const service = ensurePlacesService();
-      if (!service) {
-        alert("Google Places API の読み込みに失敗しました。");
-        return;
-      }
-      gmSearchResults.textContent = "検索中…";
-
-      const request = {
-        query: keyword,
-        fields: ["name", "formatted_address", "place_id"],
-      };
-
-      service.findPlaceFromQuery(request, (results, status) => {
-        if (status !== google.maps.places.PlacesServiceStatus.OK || !results || !results.length) {
-          gmSearchResults.textContent = "候補が見つかりませんでした。";
-          return;
-        }
-        gmSearchResults.innerHTML = "";
-        const list = document.createElement("div");
-        results.slice(0, 5).forEach(place => {
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.className = "btn-secondary";
-          btn.style.margin = "2px 4px 2px 0";
-          btn.textContent = `${place.name}（${place.formatted_address || "住所情報なし"}）`;
-          btn.addEventListener("click", () => {
-            spotNameInput.value = place.name || "";
-            const url = `https://www.google.com/maps/place/?q=place_id:${place.place_id}`;
-            placeUrlInput.value = url;
-            showToast("スポット名とGoogleマップURLを入力欄に反映しました");
-          });
-          list.appendChild(btn);
-        });
-        gmSearchResults.appendChild(list);
+    function normalizeDestinations(arr){
+      if(!Array.isArray(arr)) return [];
+      return arr.map(d => {
+        // 旧形式の url/webUrl が残っていても吸収
+        const mapUrl = d.mapUrl || d.url || '';
+        const other = d.otherLink || d.webUrl || '';
+        return {
+          eta: d.eta || '',
+          title: d.title || '',
+          mapUrl,
+          placeId: d.placeId || '',
+          transport: d.transport || '',
+          travelMinutes: (d.travelMinutes ?? '') === null ? '' : (d.travelMinutes ?? ''),
+          otherLink: other,
+          note: d.note || ''
+        };
       });
-    });
+    }
 
-    // ===== 初期化 =====
+    function applyPlanData(data, fromShare){
+      planTitleInput.value = data.title || '';
+      destinations = normalizeDestinations(data.destinations);
+
+      clearForm();
+      renderList();
+
+      if(fromShare){
+        // 共有で開いた場合：リストが先に見える（フォームを畳む）
+        sectionBasic.classList.add('collapsed');
+        sectionAdd.classList.add('collapsed');
+        setTimeout(() => {
+          document.getElementById('section-list').scrollIntoView({ behavior:'smooth' });
+        }, 150);
+      }
+    }
+
+    /***********************
+     * Init
+     ***********************/
     initTimeSelectors();
+    updateTitleBig();
     renderList();
     loadFromUrl();
   </script>
