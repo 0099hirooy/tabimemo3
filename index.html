@@ -2,552 +2,570 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>TABIMEMO | 旅にも仕事にも使える行程メモ</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta
-    name="description"
-    content="移動の予定をまとめて、すぐ共有。旅にも仕事にも使えるシンプルな行程メモ TABIMEMO。"
-  />
-
-  <!-- GA4 -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MDH61JPWSB"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-MDH61JPWSB');
-  </script>
-
-  <!-- Firebase SDK（互換レイヤー） -->
-  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
-  <script>
-    // Firebase 設定
-    const firebaseConfig = {
-      apiKey: "AIzaSyBABBAcAmnnv8gAmlCO6M6xKcvP7uAWi64",
-      authDomain: "tabimemo-842cb.firebaseapp.com",
-      projectId: "tabimemo-842cb",
-      storageBucket: "tabimemo-842cb.appspot.com",
-      messagingSenderId: "689682021634",
-      appId: "1:689682021634:web:49c603cda4ac758aa34afb",
-      measurementId: "G-MDH61JPWSB"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    db.settings({ ignoreUndefinedProperties: true });
-  </script>
-
+  <title>TABIMEMO - 行程共有ミニアプリ</title>
   <style>
     :root {
-      color-scheme: light;
-      --bg-from: #16a34a;
-      --bg-mid: #84cc16;
-      --bg-to:  #bef264;
-      --card-bg: #fef9c3;
-      --card-border: #facc15;
+      --bg-gradient-from: #ecfeff;
+      --bg-gradient-to: #fef9c3;
+      --card-bg: #fefce8;
+      --dest-bg: #ffffff;
+      --accent: #facc15;
+      --accent-deep: #eab308;
       --text-main: #111827;
-      --text-muted: #6b7280;
-      --accent: #16a34a;
+      --text-sub: #4b5563;
+      --border-subtle: #e4e4e7;
     }
-    * { box-sizing: border-box; }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      margin: 0;
-      padding: 24px 16px 40px;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: linear-gradient(135deg, var(--bg-from) 0%, var(--bg-mid) 45%, var(--bg-to) 100%);
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 16px;
       min-height: 100vh;
-      display: flex;
-      justify-content: center;
+      background: linear-gradient(135deg, var(--bg-gradient-from), var(--bg-gradient-to));
       color: var(--text-main);
     }
-    .wrapper {
-      width: 100%;
-      max-width: 960px;
-    }
+
     h1 {
-      margin: 0;
-      font-size: 2.2rem;
-      letter-spacing: 0.08em;
-    }
-    .app-header {
-      background: radial-gradient(circle at 0 0, #fee2e2 0, transparent 55%),
-                  radial-gradient(circle at 100% 100%, #dbeafe 0, transparent 55%),
-                  #ffffff;
-      border-radius: 20px;
-      padding: 20px 20px 18px;
-      box-shadow: 0 16px 30px rgba(22, 101, 52, 0.35);
-      position: relative;
-      overflow: hidden;
-      border: 3px solid var(--card-border);
-      margin-bottom: 16px;
-    }
-    .app-title-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 14px;
-      border-radius: 999px;
-      background: #f97316;
-      color: #fff;
-      font-size: 0.8rem;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-    .app-title-chip {
-      display: inline-block;
-      padding: 6px 12px;
-      background: #ffffff;
-      border-radius: 999px;
-      border: 2px solid #facc15;
-      box-shadow: 0 4px 0 #fbbf24;
-      font-weight: 800;
-      letter-spacing: 0.16em;
+      font-size: 1.6rem;
       margin-bottom: 4px;
     }
-    .app-title-dot {
-      position: absolute;
-      width: 80px;
-      height: 80px;
+
+    .app-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+
+    .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
       border-radius: 999px;
-      border: 3px dotted #f97316;
-      top: -26px;
-      right: -18px;
-      background-image: radial-gradient(#f97316 2px, transparent 2px),
-                        radial-gradient(#3b82f6 2px, transparent 2px);
-      background-position: 0 0, 6px 6px;
-      background-size: 12px 12px;
-      opacity: 0.8;
-    }
-    .app-subtitle {
-      margin: 4px 0 4px;
+      border: 3px solid var(--accent-deep);
+      background:
+        radial-gradient(circle at 10px 8px, #60a5fa 2px, transparent 3px),
+        radial-gradient(circle at 26px 18px, #f97373 2px, transparent 3px),
+        radial-gradient(circle at 42px 6px, #60a5fa 2px, transparent 3px),
+        radial-gradient(circle at 16px 24px, #fb7185 2px, transparent 3px),
+        #ffffff;
+      font-weight: 800;
+      letter-spacing: 0.08em;
       font-size: 1.05rem;
-      font-weight: 600;
+      color: #1d4ed8;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
     }
-    .app-description {
-      margin: 0;
+
+    .subtitle {
       font-size: 0.9rem;
-      color: var(--text-muted);
+      color: var(--text-sub);
+      margin-bottom: 4px;
     }
+
+    .lead {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      margin-bottom: 16px;
+    }
+
     .card {
       background: var(--card-bg);
-      border-radius: 14px;
-      padding: 16px 16px 14px;
-      box-shadow: 0 6px 18px rgba(22, 101, 52, 0.25);
-      margin-bottom: 14px;
-      border: 1px solid var(--card-border);
+      padding: 16px;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.09);
+      margin-bottom: 16px;
+      border: 1px solid rgba(250, 204, 21, 0.4);
     }
-    .card h2 {
+
+    h2 {
       font-size: 1.0rem;
-      margin: 0 0 8px;
+      margin-top: 0;
+      margin-bottom: 8px;
     }
+
     label {
-      font-size: 0.82rem;
+      font-size: 0.85rem;
       display: block;
-      margin-top: 8px;
+      margin-top: 10px;
     }
+
     input, textarea, select {
       width: 100%;
-      padding: 7px 9px;
-      border-radius: 10px;
+      box-sizing: border-box;
+      padding: 8px;
+      border-radius: 8px;
       border: 1px solid #d4d4d8;
       margin-top: 4px;
-      font-size: 0.89rem;
-      font-family: inherit;
+      font-size: 0.9rem;
       background: #ffffff;
       color: var(--text-main);
     }
+
     input::placeholder,
     textarea::placeholder {
       color: #9ca3af;
     }
-    textarea { resize: vertical; min-height: 46px; }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .inline-time {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 4px;
+    }
+
+    .inline-time select {
+      width: auto;
+      flex: 0 0 auto;
+      min-width: 80px;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
     button {
       border: none;
       border-radius: 999px;
       padding: 8px 16px;
       font-size: 0.9rem;
       cursor: pointer;
-      margin-top: 10px;
-      font-weight: 600;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      font-family: inherit;
+      gap: 4px;
+      white-space: nowrap;
     }
+
     .btn-primary {
-      background: var(--accent);
-      color: #fff;
-      box-shadow: 0 4px 0 #15803d;
+      background: #2563eb;
+      color: #ffffff;
     }
-    .btn-primary:active {
-      transform: translateY(1px);
-      box-shadow: 0 2px 0 #15803d;
-    }
+
     .btn-secondary {
       background: #e4e4e7;
       color: #111827;
     }
-    .btn-secondary:active {
-      transform: translateY(1px);
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #d4d4d8;
+      color: #111827;
     }
+
     .dest-list {
       list-style: none;
       padding: 0;
       margin: 0;
     }
+
     .dest-item {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
       gap: 8px;
-      padding: 8px 10px;
+      padding: 10px 10px;
       margin-bottom: 8px;
-      background: #ffffff;
-      border-radius: 10px;
-      border: 1px dashed #fde68a;
+      border-radius: 12px;
+      background: var(--dest-bg);
+      border: 1px solid var(--border-subtle);
     }
-    .dest-item[draggable="true"] {
-      cursor: grab;
-    }
-    .dest-item.drag-over {
-      border-color: #16a34a;
-      box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.25);
-    }
+
     .dest-main {
       flex: 1;
-      font-size: 0.9rem;
     }
+
     .dest-title {
       font-weight: 600;
       font-size: 0.95rem;
-      color: #374151;
+      margin-bottom: 2px;
+      color: #111827;
     }
-    .dest-url {
+
+    .dest-url,
+    .dest-site-url {
       font-size: 0.8rem;
       color: #2563eb;
       word-break: break-all;
       text-decoration: none;
     }
-    .dest-url:hover { text-decoration: underline; }
+
+    .dest-url:hover,
+    .dest-site-url:hover {
+      text-decoration: underline;
+    }
+
     .dest-meta {
-      font-size: 0.78rem;
-      color: var(--text-muted);
+      font-size: 0.8rem;
+      color: #6b7280;
       margin-top: 4px;
     }
+
     .dest-actions {
       display: flex;
-      flex-direction: row;
+      flex-direction: column;
       gap: 4px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
     }
+
     .small-btn {
-      padding: 3px 8px;
+      padding: 4px 8px;
       font-size: 0.75rem;
     }
-    .note-text {
-      font-size: 0.78rem;
-      color: #4b5563;
-      margin-top: 4px;
-    }
-    .status-message {
-      font-size: 0.8rem;
-      margin-top: 4px;
-      color: #065f46;
-    }
-    .edit-field {
-      width: 100%;
-      margin-top: 4px;
-      padding: 4px 6px;
-      border-radius: 6px;
-      border: 1px solid #d4d4d8;
-      font-size: 0.8rem;
-      font-family: inherit;
-    }
-    .edit-row-buttons {
-      margin-top: 6px;
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-    .plan-title-display {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: #1f2937;
-      margin-bottom: 10px;
-    }
 
-    /* 共有 UI 用 */
-    .share-section {
-      margin-bottom: 12px;
-    }
-    .share-heading {
-      font-size: 0.85rem;
-      font-weight: 600;
+    .drag-handle {
+      cursor: grab;
+      font-size: 0.9rem;
+      user-select: none;
       margin-bottom: 4px;
-      color: #374151;
-    }
-    .share-generate-btn {
-      margin-top: 4px;
-      margin-bottom: 6px;
-    }
-    .share-input-row {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-    }
-    .share-input {
-      flex: 1;
-      padding: 6px 8px;
-      border-radius: 999px;
-      border: 1px solid #d4d4d8;
-      font-size: 0.8rem;
-      background: #ffffff;
+      color: #9ca3af;
     }
 
-    @media (min-width: 720px) {
-      body { padding: 32px 24px 48px; }
-      h1 { font-size: 2.4rem; }
-      .card { padding: 18px 18px 16px; }
+    .dest-item.drag-over {
+      border-style: dashed;
+      border-color: #60a5fa;
+      background: #eff6ff;
+    }
+
+    .share-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+
+    .share-link {
+      font-size: 0.8rem;
+      word-break: break-all;
+      margin-top: 4px;
+      color: #111827;
+    }
+
+    .plan-title-display {
+      font-weight: 700;
+      font-size: 1.05rem;
+      margin-bottom: 8px;
+      color: #1f2937;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      background: #e0f2fe;
+      color: #1d4ed8;
+      margin-left: 6px;
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 12px;
+      }
+      .app-title-wrap {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .logo-badge {
+        font-size: 0.95rem;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="wrapper">
-    <header class="app-header">
-      <div class="app-title-badge">🚉 ルート管理メモ</div>
-      <div class="app-title-chip">TABIMEMO</div>
-      <h1>移動の予定をまとめて、すぐ共有。</h1>
-      <p class="app-subtitle">旅にも仕事にも使える行程メモ。</p>
-      <p class="app-description">
-        行き先のURL・順番・移動手段・所要時間をまとめて、URLひとつで仲間と共有できます。
-      </p>
-      <div class="app-title-dot"></div>
-    </header>
-
-    <div class="card">
-      <h2>旅・仕事プランのタイトル</h2>
-      <label>
-        タイトル
-        <input id="tripTitleInput"
-               placeholder="例：四国一周サーフトリップ、徳島FW1日目、東京営業ルート など" />
-      </label>
-    </div>
-
-    <div class="card">
-      <h2>① 行き先を追加</h2>
-      <label>
-        行き先の名前
-        <input id="titleInput"
-               placeholder="例：1日目ホテル、ひろめ市場、A社本社ビル など" />
-      </label>
-      <label>
-        行き先URL（公式サイトやGoogleマップのURL）
-        <input id="urlInput"
-               placeholder="例：https://maps.google.com/… や https://〜 など" />
-      </label>
-
-      <label>到着予定時間（任意）</label>
-      <div style="display:flex; gap:8px; margin-top:4px;">
-        <select id="etaHour" style="flex:0 0 40%;">
-          <option value="">-- 時 --</option>
-        </select>
-        <select id="etaMinute" style="flex:0 0 40%;">
-          <option value="">-- 分 --</option>
-        </select>
+  <header>
+    <div class="app-title-wrap">
+      <div class="logo-badge">TABIMEMO</div>
+      <div>
+        <div class="subtitle">〜 旅のルートや行程を一括管理して皆で共有 〜</div>
+        <p class="lead">
+          旅先や移動中に「次どこ行く？」と検索する時間をゼロにしたい。<br>
+          旅や一日の移動行程を、シンプルで見やすいリストにまとめてそのまま共有できます。
+        </p>
       </div>
+    </div>
+  </header>
 
-      <label>
-        前の地点からの移動手段
-        <select id="transportInput">
-          <option value="">（最初の地点 or 未設定）</option>
-          <option value="car">🚗 車</option>
-          <option value="train">🚃 電車</option>
-          <option value="bus">🚌 バス</option>
-          <option value="walk">🚶 徒歩</option>
-          <option value="bike">🚲 自転車</option>
-          <option value="plane">✈️ 飛行機</option>
+  <div class="card">
+    <h2>旅の基本情報</h2>
+    <label>
+      旅のタイトル（例：四国一周サーフトリップ、徳島FW1日目）
+      <input id="tripTitleInput" placeholder="旅のタイトルを入力（例：東京出張1日目ルート）" />
+    </label>
+  </div>
+
+  <div class="card">
+    <h2>① 行き先を追加</h2>
+
+    <label>
+      行き先の名前（例：1日目ホテル、ひろめ市場、A社 本社ビル）
+      <input id="titleInput" placeholder="スポット名・訪問先などを入力" />
+    </label>
+
+    <label>
+      Googleマップで場所を検索（TABIMEMO内で完結）
+      <input id="gmSearchInput" placeholder="例：鳴門公園、神山温泉、渋谷駅 などを入力して候補から選択" />
+      <span style="font-size:0.75rem;color:#6b7280;display:block;margin-top:4px;">
+        候補を選ぶと「行き先の名前」と「行き先URL（Googleマップ）」が自動で入力されます。
+      </span>
+    </label>
+
+    <label>
+      行き先URL（Googleマップや各種リンク）
+      <input id="urlInput" placeholder="https://（GoogleマップURLや各種リンク）" />
+    </label>
+
+    <label>
+      WebサイトURL（任意：公式HP・予約ページ・資料など）
+      <input id="siteUrlInput" placeholder="https://（公式サイト、イベントページ、YouTube、PDF など）" />
+    </label>
+
+    <label>
+      到着予定時間（任意）
+      <div class="inline-time">
+        <select id="etaHourSelect">
+          <option value="">時間を選択</option>
         </select>
-      </label>
-      <label>
-        前の地点からの移動時間（分）
-        <input id="travelMinutesInput" type="number" min="0"
-               placeholder="例：25（Googleマップの結果をそのまま入力）" />
-      </label>
-      <label>
-        メモ（任意）
-        <textarea id="noteInput" rows="2"
-          placeholder="例：〇〇駅改札前に9:50集合、A社は3階受付で名刺提出 など"></textarea>
-      </label>
-      <button class="btn-primary" onclick="addDestination()">リストに追加</button>
-      <p class="note-text">
-        ※ 正確な移動時間は Googleマップで確認して、「移動時間（分）」に入力すると便利です。
-      </p>
-    </div>
-
-    <div class="card" id="listCard">
-      <h2>② 行き先リスト＆順番</h2>
-      <div id="planTitleDisplay" class="plan-title-display"></div>
-      <ul id="destList" class="dest-list"></ul>
-      <p class="note-text">
-        ※ 並び順がそのままルート順（1 → 2 → 3…）になります。<br />
-        「↑」「↓」「編集」ボタン、またはドラッグ＆ドロップで順番や内容を変えられます。
-      </p>
-    </div>
-
-    <div class="card">
-      <h2>③ 仲間と共有</h2>
-
-      <!-- 短い共有リンク（おすすめ） -->
-      <div class="share-section">
-        <div class="share-heading">おすすめ：短い共有リンク</div>
-        <button class="btn-primary share-generate-btn" onclick="generateShortCloudLink()">
-          短いリンクを作成
-        </button>
-        <div class="share-input-row">
-          <input
-            id="shortLinkInput"
-            class="share-input"
-            placeholder="ここに短いURLが表示されます"
-            readonly
-          />
-          <button class="btn-secondary small-btn" onclick="copyShortLink()">コピー</button>
-        </div>
+        <span>時</span>
+        <select id="etaMinuteSelect">
+          <option value="">分を選択（未選択なら00分）</option>
+        </select>
+        <span style="font-size:0.75rem;color:#6b7280;">
+          例）10:00、13:30
+        </span>
       </div>
+    </label>
 
-      <!-- 長い共有リンク（バックアップ用） -->
-      <div class="share-section">
-        <div class="share-heading">バックアップ用：長い共有リンク</div>
-        <button class="btn-secondary share-generate-btn" onclick="generateShareLink()">
-          長いリンクを作成
-        </button>
-        <div class="share-input-row">
-          <input
-            id="longLinkInput"
-            class="share-input"
-            placeholder="ここに長いURLが表示されます"
-            readonly
-          />
-          <button class="btn-secondary small-btn" onclick="copyLongLink()">コピー</button>
-        </div>
-      </div>
+    <label>
+      前の地点からの移動手段
+      <select id="transportInput">
+        <option value="">（最初の地点 or 未設定）</option>
+        <option value="car">🚗 車</option>
+        <option value="train">🚃 電車</option>
+        <option value="bus">🚌 バス</option>
+        <option value="walk">🚶 徒歩</option>
+        <option value="bike">🚲 自転車</option>
+        <option value="plane">✈️ 飛行機</option>
+      </select>
+    </label>
 
-      <p class="note-text">
-        ・短い共有リンク：行程データをクラウド（Firestore）に保存し、「?p=XXXX」形式の短いURLで呼び出します。<br />
-        ・長い共有リンク：URLに行程データ全部を埋め込む方式。どこに送っても再現できる“バックアップ用”です。
-      </p>
-      <p id="statusMessage" class="status-message"></p>
+    <label>
+      前の地点からの移動時間（分）
+      <input id="travelMinutesInput" type="number" min="0" placeholder="例：25（Googleマップの結果をそのまま入力）" />
+    </label>
+
+    <label>
+      メモ（任意）
+      <textarea id="noteInput" rows="2" placeholder="集合場所、注意点、持ち物など"></textarea>
+    </label>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="addUpdateBtn" onclick="addOrUpdateDestination()">リストに追加</button>
+      <button class="btn-outline" onclick="clearForm()">入力をクリア</button>
     </div>
+
+    <p style="font-size:0.75rem;color:#6b7280;margin-top:8px;">
+      ※ 正確な移動時間は Googleマップで確認して、「移動時間（分）」に入力すると便利です。<br>
+      ※ 行き先のHPや資料がある場合は「WebサイトURL」に入れておくとあとで便利です。
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>② 行き先リスト＆順番</h2>
+    <div id="planTitleDisplay" class="plan-title-display" style="display:none;"></div>
+    <ul id="destList" class="dest-list"></ul>
+    <p style="font-size:0.8rem;color:#6b7280;">
+      ※ 並び順がそのままルート順（1 → 2 → 3…）になります。<br>
+      各行をドラッグして順番を入れ替えできます。
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>③ 仲間と共有</h2>
+    <p style="font-size:0.8rem;color:#6b7280;margin-top:0;">
+      作成した行程を、そのままLINEやメールで共有できます。
+    </p>
+
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="generateShareLink()">
+        長い共有リンクを作成
+      </button>
+      <button class="btn-secondary" onclick="generateShortLocalLink()">
+        短い共有リンク（この端末限定）を作成
+      </button>
+    </div>
+
+    <div class="share-label">長い共有リンク（どの端末でも再現可）：</div>
+    <div id="shareLink" class="share-link"></div>
+
+    <div class="share-label">短縮リンク（このブラウザ限定）：</div>
+    <div id="shortLink" class="share-link"></div>
+
+    <p style="font-size:0.8rem;color:#6b7280;">
+      ・長いリンク：URLに旅データ全部を埋め込むので、どこに送っても再現できます（かなり長くなります）。<br>
+      ・短縮リンク：このブラウザの中に旅データを保存し、「#p=XXXX」形式の短いURLで呼び出します。<br>
+      　→ そのため、別のPCやスマホでは再現できません。
+    </p>
   </div>
 
   <script>
-    // ===== 状態 =====
     let destinations = [];
-    let tripTitle = "";
+    let tripTitle = '';
     let editingIndex = null;
-    let dragIndex = null;
+    let dragSrcIndex = null;
 
     const transportIcons = {
-      car: "🚗 車",
-      train: "🚃 電車",
-      bus: "🚌 バス",
-      walk: "🚶 徒歩",
-      bike: "🚲 自転車",
-      plane: "✈️ 飛行機"
+      car: '🚗 車',
+      train: '🚃 電車',
+      bus: '🚌 バス',
+      walk: '🚶 徒歩',
+      bike: '🚲 自転車',
+      plane: '✈️ 飛行機'
     };
 
-    // ===== 共通ユーティリティ =====
-    function setStatusMessage(msg) {
-      document.getElementById("statusMessage").textContent = msg || "";
-    }
+    // 時刻セレクト初期化
+    (function initTimeSelects() {
+      const hourSel = document.getElementById('etaHourSelect');
+      const minSel = document.getElementById('etaMinuteSelect');
 
-    function updatePlanTitleDisplay() {
-      const el = document.getElementById("planTitleDisplay");
-      if (!el) return;
-      el.textContent = tripTitle ? `プランタイトル：${tripTitle}` : "";
-    }
+      for (let h = 0; h <= 23; h++) {
+        const opt = document.createElement('option');
+        opt.value = String(h);
+        opt.textContent = `${h}時`;
+        hourSel.appendChild(opt);
+      }
 
-    function scrollToListIfNeeded() {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get("p") || params.get("plan") || window.location.hash.startsWith("#p=")) {
-        const card = document.getElementById("listCard");
-        if (card) {
-          card.scrollIntoView({ behavior: "smooth", block: "start" });
+      for (let m = 0; m < 60; m += 1) {
+        const opt = document.createElement('option');
+        opt.value = String(m);
+        opt.textContent = m.toString().padStart(2, '0') + '分';
+        minSel.appendChild(opt);
+      }
+    })();
+
+    // ページ読み込み時：URL or ハッシュに共有データがあれば復元
+    (function loadFromUrlOrHash() {
+      const params = new URLSearchParams(location.search);
+      const dataParam = params.get('plan');
+
+      if (dataParam) {
+        try {
+          const json = JSON.parse(decodeURIComponent(atob(dataParam)));
+          if (Array.isArray(json)) {
+            destinations = json;
+            tripTitle = '';
+          } else if (json && Array.isArray(json.destinations)) {
+            destinations = json.destinations;
+            tripTitle = json.title || '';
+          }
+          renderList();
+          const titleInput = document.getElementById('tripTitleInput');
+          titleInput.value = tripTitle;
+          return;
+        } catch (e) {
+          console.error('共有データ(plan)の読み込みに失敗しました', e);
         }
       }
-    }
 
-    function fillTimeSelects() {
-      const hourSel = document.getElementById("etaHour");
-      const minuteSel = document.getElementById("etaMinute");
-      for (let h = 0; h < 24; h++) {
-        const v = String(h).padStart(2, "0");
-        const o = document.createElement("option");
-        o.value = v;
-        o.textContent = `${v} 時`;
-        hourSel.appendChild(o);
+      const hash = location.hash.replace(/^#/, '');
+      if (!hash) return;
+
+      const hashParams = new URLSearchParams(hash);
+      const pid = hashParams.get('p');
+      if (!pid) return;
+
+      try {
+        const stored = JSON.parse(localStorage.getItem('tripPlans') || '{}');
+        const plan = stored[pid];
+        if (plan && Array.isArray(plan.destinations)) {
+          destinations = plan.destinations;
+          tripTitle = plan.title || '';
+          renderList();
+          const titleInput = document.getElementById('tripTitleInput');
+          titleInput.value = tripTitle;
+        }
+      } catch (e) {
+        console.error('短縮リンクデータの読み込みに失敗しました', e);
       }
-      for (let m = 0; m < 60; m++) {
-        const v = String(m).padStart(2, "0");
-        const o = document.createElement("option");
-        o.value = v;
-        o.textContent = `${v} 分`;
-        minuteSel.appendChild(o);
-      }
-    }
+    })();
 
     function syncTripTitle() {
-      tripTitle = document.getElementById("tripTitleInput").value.trim();
-      updatePlanTitleDisplay();
+      tripTitle = document.getElementById('tripTitleInput').value.trim();
+      const titleView = document.getElementById('planTitleDisplay');
+      if (tripTitle) {
+        titleView.textContent = tripTitle;
+        titleView.style.display = 'block';
+      } else {
+        titleView.style.display = 'none';
+      }
     }
-    document.getElementById("tripTitleInput").addEventListener("input", syncTripTitle);
 
-    // ===== 行き先追加 =====
-    function addDestination() {
+    document.getElementById('tripTitleInput').addEventListener('input', syncTripTitle);
+
+    function clearForm() {
+      document.getElementById('titleInput').value = '';
+      document.getElementById('gmSearchInput').value = '';
+      document.getElementById('urlInput').value = '';
+      document.getElementById('siteUrlInput').value = '';
+      document.getElementById('etaHourSelect').value = '';
+      document.getElementById('etaMinuteSelect').value = '';
+      document.getElementById('transportInput').value = '';
+      document.getElementById('travelMinutesInput').value = '';
+      document.getElementById('noteInput').value = '';
+      editingIndex = null;
+      document.getElementById('addUpdateBtn').textContent = 'リストに追加';
+    }
+
+    function addOrUpdateDestination() {
       syncTripTitle();
-      const title = document.getElementById("titleInput").value.trim();
-      const url = document.getElementById("urlInput").value.trim();
-      const hour = document.getElementById("etaHour").value;
-      const minute = document.getElementById("etaMinute").value;
-      const transport = document.getElementById("transportInput").value;
-      const travelMinutesValue = document.getElementById("travelMinutesInput").value;
-      const travelMinutes = travelMinutesValue === "" ? null : Number(travelMinutesValue);
-      const note = document.getElementById("noteInput").value.trim();
 
-      if (!title && !url) {
-        alert("少なくとも「行き先の名前」か「URL」のどちらかは入力してください。");
+      const title = document.getElementById('titleInput').value.trim();
+      const url = document.getElementById('urlInput').value.trim();
+      const siteUrl = document.getElementById('siteUrlInput').value.trim();
+      const etaHourVal = document.getElementById('etaHourSelect').value;
+      const etaMinuteVal = document.getElementById('etaMinuteSelect').value;
+      const transport = document.getElementById('transportInput').value;
+      const travelMinutesValue = document.getElementById('travelMinutesInput').value;
+      const travelMinutes = travelMinutesValue === '' ? null : Number(travelMinutesValue);
+      const note = document.getElementById('noteInput').value.trim();
+
+      if (!title && !url && !siteUrl) {
+        alert('少なくとも「行き先の名前」か「行き先URL」か「WebサイトURL」のどれかは入力してください。');
         return;
       }
 
-      let eta = "";
-      if (hour && !minute) {
-        eta = `${hour}:00`;
-      } else if (hour && minute) {
-        eta = `${hour}:${minute}`;
-      } else if (!hour && minute) {
-        eta = `--:${minute}`;
-      } else {
-        eta = "";
-      }
+      const etaHour = etaHourVal === '' ? null : Number(etaHourVal);
+      const etaMinute = etaMinuteVal === '' ? null : Number(etaMinuteVal);
 
-      destinations.push({
+      const dest = {
         id: Date.now() + Math.random(),
         title,
         url,
-        eta,
+        siteUrl,
+        etaHour,
+        etaMinute,
         transport,
         travelMinutes,
         note
-      });
+      };
 
-      document.getElementById("titleInput").value = "";
-      document.getElementById("urlInput").value = "";
-      document.getElementById("etaHour").value = "";
-      document.getElementById("etaMinute").value = "";
-      document.getElementById("transportInput").value = "";
-      document.getElementById("travelMinutesInput").value = "";
-      document.getElementById("noteInput").value = "";
+      if (editingIndex === null) {
+        destinations.push(dest);
+      } else {
+        destinations[editingIndex] = dest;
+      }
 
+      clearForm();
       renderList();
     }
 
@@ -561,450 +579,282 @@
     }
 
     function deleteDestination(index) {
-      if (!confirm("この行き先を削除しますか？")) return;
+      if (!confirm('この行き先を削除しますか？')) return;
       destinations.splice(index, 1);
-      if (editingIndex === index) editingIndex = null;
       renderList();
     }
 
-    // ===== 行内編集 =====
-    function startEdit(index) {
+    function editDestination(index) {
+      const d = destinations[index];
       editingIndex = index;
-      renderList();
+
+      document.getElementById('titleInput').value = d.title || '';
+      document.getElementById('gmSearchInput').value = '';
+      document.getElementById('urlInput').value = d.url || '';
+      document.getElementById('siteUrlInput').value = d.siteUrl || '';
+      document.getElementById('etaHourSelect').value = d.etaHour != null ? String(d.etaHour) : '';
+      document.getElementById('etaMinuteSelect').value = d.etaMinute != null ? String(d.etaMinute) : '';
+      document.getElementById('transportInput').value = d.transport || '';
+      document.getElementById('travelMinutesInput').value = d.travelMinutes != null ? String(d.travelMinutes) : '';
+      document.getElementById('noteInput').value = d.note || '';
+
+      document.getElementById('addUpdateBtn').textContent = 'この行を更新';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function cancelEdit() {
-      editingIndex = null;
-      renderList();
-    }
-
-    function saveEdit(index) {
-      const t = document.getElementById(`edit-title-${index}`).value.trim();
-      const u = document.getElementById(`edit-url-${index}`).value.trim();
-      const e = document.getElementById(`edit-eta-${index}`).value.trim();
-      const tr = document.getElementById(`edit-transport-${index}`).value;
-      const tmValue = document.getElementById(`edit-travel-${index}`).value.trim();
-      const tm = tmValue === "" ? null : Number(tmValue);
-      const n = document.getElementById(`edit-note-${index}`).value.trim();
-
-      destinations[index] = {
-        ...destinations[index],
-        title: t,
-        url: u,
-        eta: e,
-        transport: tr,
-        travelMinutes: tm,
-        note: n
-      };
-      editingIndex = null;
-      renderList();
-    }
-
-    function getShortUrlText(url) {
-      if (!url) return "";
-      if (url.length <= 20) return url;
-      return url.slice(0, 20) + "…";
-    }
-
-    // ===== DnD ハンドラ =====
-    function handleDragStart(e) {
-      if (editingIndex !== null) {
-        e.preventDefault();
-        return;
-      }
-      dragIndex = Number(e.currentTarget.dataset.index);
-      e.dataTransfer.effectAllowed = "move";
-      e.dataTransfer.setData("text/plain", dragIndex);
-      e.currentTarget.style.opacity = "0.5";
-    }
-
-    function handleDragOver(e) {
-      if (dragIndex === null) return;
-      e.preventDefault();
-      e.dataTransfer.dropEffect = "move";
-      const li = e.currentTarget;
-      li.classList.add("drag-over");
-    }
-
-    function handleDragLeave(e) {
-      e.currentTarget.classList.remove("drag-over");
-    }
-
-    function handleDrop(e) {
-      e.preventDefault();
-      const li = e.currentTarget;
-      li.classList.remove("drag-over");
-      const targetIndex = Number(li.dataset.index);
-      if (dragIndex === null || isNaN(targetIndex) || dragIndex === targetIndex) {
-        dragIndex = null;
-        return;
-      }
-      const moved = destinations.splice(dragIndex, 1)[0];
-      destinations.splice(targetIndex, 0, moved);
-      dragIndex = null;
-      renderList();
-    }
-
-    function handleDragEnd(e) {
-      e.currentTarget.style.opacity = "";
-      dragIndex = null;
-      const items = document.querySelectorAll(".dest-item.drag-over");
-      items.forEach(i => i.classList.remove("drag-over"));
-    }
-
-    // ===== リスト描画 =====
     function renderList() {
-      const ul = document.getElementById("destList");
-      ul.innerHTML = "";
-      updatePlanTitleDisplay();
+      const ul = document.getElementById('destList');
+      ul.innerHTML = '';
 
-      if (destinations.length === 0) {
-        const li = document.createElement("li");
-        li.className = "dest-item";
-        li.innerHTML =
-          '<div class="dest-main"><div class="dest-title" style="color:#9ca3af;">例）10:00 ひろめ市場</div><div class="dest-meta">到着予定：10:00 ｜ 移動手段：🚃 電車 ｜ 前の地点からの移動時間：約 25 分</div><div class="dest-meta">メモ：受付で担当者名を伝えてください</div></div>';
-        ul.appendChild(li);
-        return;
-      }
+      syncTripTitle();
 
       destinations.forEach((d, i) => {
-        const li = document.createElement("li");
-        li.className = "dest-item";
+        const li = document.createElement('li');
+        li.className = 'dest-item';
+        li.draggable = true;
+        li.dataset.index = String(i);
 
-        if (editingIndex === null) {
-          li.draggable = true;
-          li.dataset.index = i;
-          li.addEventListener("dragstart", handleDragStart);
-          li.addEventListener("dragover", handleDragOver);
-          li.addEventListener("dragleave", handleDragLeave);
-          li.addEventListener("drop", handleDrop);
-          li.addEventListener("dragend", handleDragEnd);
-        } else {
-          li.draggable = false;
+        const main = document.createElement('div');
+        main.className = 'dest-main';
+
+        const title = document.createElement('div');
+        title.className = 'dest-title';
+
+        // 到着時間を先に表示
+        let etaText = '未設定';
+        if (d.etaHour != null) {
+          const hh = String(d.etaHour).padStart(2, '0');
+          const mm = d.etaMinute != null ? String(d.etaMinute).padStart(2, '0') : '00';
+          etaText = `${hh}:${mm}`;
+        }
+        title.textContent = `${i + 1}. [${etaText}] ${d.title || '(タイトルなし)'}`;
+        main.appendChild(title);
+
+        if (d.url) {
+          const a = document.createElement('a');
+          a.href = d.url;
+          a.textContent = d.url;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.className = 'dest-url';
+          main.appendChild(a);
         }
 
-        const main = document.createElement("div");
-        main.className = "dest-main";
-
-        if (editingIndex === i) {
-          const titleLabel = document.createElement("div");
-          titleLabel.textContent = "行き先を編集";
-          titleLabel.style.fontWeight = "600";
-          titleLabel.style.fontSize = "0.9rem";
-          main.appendChild(titleLabel);
-
-          const tInput = document.createElement("input");
-          tInput.id = `edit-title-${i}`;
-          tInput.className = "edit-field";
-          tInput.placeholder = "行き先の名前";
-          tInput.value = d.title || "";
-          main.appendChild(tInput);
-
-          const uInput = document.createElement("input");
-          uInput.id = `edit-url-${i}`;
-          uInput.className = "edit-field";
-          uInput.placeholder = "行き先URL（公式サイトやGoogleマップURLなど）";
-          uInput.value = d.url || "";
-          main.appendChild(uInput);
-
-          const eInput = document.createElement("input");
-          eInput.id = `edit-eta-${i}`;
-          eInput.className = "edit-field";
-          eInput.placeholder = "到着予定（例：10:00）";
-          eInput.value = d.eta || "";
-          main.appendChild(eInput);
-
-          const trSelect = document.createElement("select");
-          trSelect.id = `edit-transport-${i}`;
-          trSelect.className = "edit-field";
-          ["", "car", "train", "bus", "walk", "bike", "plane"].forEach(v => {
-            const opt = document.createElement("option");
-            opt.value = v;
-            opt.textContent =
-              v === "" ? "移動手段（未設定）"
-              : v === "car" ? "🚗 車"
-              : v === "train" ? "🚃 電車"
-              : v === "bus" ? "🚌 バス"
-              : v === "walk" ? "🚶 徒歩"
-              : v === "bike" ? "🚲 自転車"
-              : "✈️ 飛行機";
-            if (v === d.transport) opt.selected = true;
-            trSelect.appendChild(opt);
-          });
-          main.appendChild(trSelect);
-
-          const tmInput = document.createElement("input");
-          tmInput.id = `edit-travel-${i}`;
-          tmInput.className = "edit-field";
-          tmInput.type = "number";
-          tmInput.min = "0";
-          tmInput.placeholder = "前の地点からの移動時間（分）";
-          tmInput.value = d.travelMinutes != null ? d.travelMinutes : "";
-          main.appendChild(tmInput);
-
-          const nInput = document.createElement("textarea");
-          nInput.id = `edit-note-${i}`;
-          nInput.className = "edit-field";
-          nInput.rows = 2;
-          nInput.placeholder = "メモ";
-          nInput.value = d.note || "";
-          main.appendChild(nInput);
-
-          const btnRow = document.createElement("div");
-          btnRow.className = "edit-row-buttons";
-
-          const saveBtn = document.createElement("button");
-          saveBtn.className = "btn-primary small-btn";
-          saveBtn.textContent = "保存";
-          saveBtn.onclick = () => saveEdit(i);
-          btnRow.appendChild(saveBtn);
-
-          const cancelBtn = document.createElement("button");
-          cancelBtn.className = "btn-secondary small-btn";
-          cancelBtn.textContent = "キャンセル";
-          cancelBtn.onclick = () => cancelEdit();
-          btnRow.appendChild(cancelBtn);
-
-          main.appendChild(btnRow);
-        } else {
-          const title = document.createElement("div");
-          title.className = "dest-title";
-          const label = d.title || "(タイトルなし)";
-          title.textContent = d.eta ? `${d.eta}  ${label}` : label;
-          main.appendChild(title);
-
-          if (d.url) {
-            const urlLine = document.createElement("div");
-            const a = document.createElement("a");
-            a.href = d.url;
-            a.target = "_blank";
-            a.rel = "noopener noreferrer";
-            a.className = "dest-url";
-            a.textContent = getShortUrlText(d.url);
-            urlLine.appendChild(a);
-            main.appendChild(urlLine);
-          }
-
-          if (d.title) {
-            const g = document.createElement("a");
-            g.href = "https://www.google.com/maps/search/?api=1&query=" +
-                     encodeURIComponent(d.title);
-            g.textContent = "Googleマップで確認";
-            g.target = "_blank";
-            g.rel = "noopener noreferrer";
-            g.style.fontSize = "0.8rem";
-            g.style.color = "#16a34a";
-            g.style.display = "inline-block";
-            g.style.marginTop = "2px";
-            main.appendChild(g);
-          }
-
-          const metaLines = [];
-          if (!d.eta) {
-            metaLines.push("到着予定：未設定");
-          }
-          if (d.transport) {
-            metaLines.push(`移動手段：${transportIcons[d.transport] || d.transport}`);
-          }
-          if (d.travelMinutes != null && !Number.isNaN(d.travelMinutes)) {
-            metaLines.push(`前の地点からの移動時間：約 ${d.travelMinutes} 分`);
-          }
-          if (metaLines.length > 0) {
-            const meta = document.createElement("div");
-            meta.className = "dest-meta";
-            meta.textContent = metaLines.join(" ｜ ");
-            main.appendChild(meta);
-          }
-          if (d.note) {
-            const noteEle = document.createElement("div");
-            noteEle.className = "dest-meta";
-            noteEle.textContent = `メモ：${d.note}`;
-            main.appendChild(noteEle);
-          }
+        if (d.siteUrl) {
+          const site = document.createElement('div');
+          const aSite = document.createElement('a');
+          aSite.href = d.siteUrl;
+          aSite.textContent = d.siteUrl;
+          aSite.target = '_blank';
+          aSite.rel = 'noopener noreferrer';
+          aSite.className = 'dest-site-url';
+          site.appendChild(aSite);
+          main.appendChild(site);
         }
 
-        const actions = document.createElement("div");
-        actions.className = "dest-actions";
+        const metaLines = [];
 
-        if (editingIndex !== i) {
-          const upBtn = document.createElement("button");
-          upBtn.textContent = "↑";
-          upBtn.className = "small-btn btn-secondary";
-          upBtn.onclick = () => moveDestination(i, -1);
-          actions.appendChild(upBtn);
+        metaLines.push(`到着予定：${etaText}`);
 
-          const downBtn = document.createElement("button");
-          downBtn.textContent = "↓";
-          downBtn.className = "small-btn btn-secondary";
-          downBtn.onclick = () => moveDestination(i, 1);
-          actions.appendChild(downBtn);
-
-          const editBtn = document.createElement("button");
-          editBtn.textContent = "編集";
-          editBtn.className = "small-btn btn-secondary";
-          editBtn.onclick = () => startEdit(i);
-          actions.appendChild(editBtn);
-
-          const delBtn = document.createElement("button");
-          delBtn.textContent = "削除";
-          delBtn.className = "small-btn btn-secondary";
-          delBtn.onclick = () => deleteDestination(i);
-          actions.appendChild(delBtn);
+        if (d.transport) {
+          metaLines.push(`移動手段：${transportIcons[d.transport] || d.transport}`);
         }
+
+        if (d.travelMinutes != null && !Number.isNaN(d.travelMinutes)) {
+          metaLines.push(`前の地点からの移動時間：約 ${d.travelMinutes} 分`);
+        }
+
+        if (metaLines.length > 0) {
+          const meta = document.createElement('div');
+          meta.className = 'dest-meta';
+          meta.textContent = metaLines.join(' ｜ ');
+          main.appendChild(meta);
+        }
+
+        if (d.note) {
+          const note = document.createElement('div');
+          note.className = 'dest-meta';
+          note.textContent = `メモ：${d.note}`;
+          main.appendChild(note);
+        }
+
+        const actions = document.createElement('div');
+        actions.className = 'dest-actions';
+
+        const dragHandle = document.createElement('div');
+        dragHandle.className = 'drag-handle';
+        dragHandle.textContent = '↕';
+        actions.appendChild(dragHandle);
+
+        const editBtn = document.createElement('button');
+        editBtn.textContent = '編集';
+        editBtn.className = 'small-btn btn-secondary';
+        editBtn.onclick = () => editDestination(i);
+        actions.appendChild(editBtn);
+
+        const delBtn = document.createElement('button');
+        delBtn.textContent = '削除';
+        delBtn.className = 'small-btn btn-secondary';
+        delBtn.onclick = () => deleteDestination(i);
+        actions.appendChild(delBtn);
 
         li.appendChild(main);
         li.appendChild(actions);
+
+        // Drag & Drop イベント
+        li.addEventListener('dragstart', (e) => {
+          dragSrcIndex = i;
+          e.dataTransfer.effectAllowed = 'move';
+        });
+
+        li.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          li.classList.add('drag-over');
+        });
+
+        li.addEventListener('dragleave', () => {
+          li.classList.remove('drag-over');
+        });
+
+        li.addEventListener('drop', (e) => {
+          e.preventDefault();
+          li.classList.remove('drag-over');
+          const targetIndex = Number(li.dataset.index);
+          if (dragSrcIndex == null || Number.isNaN(targetIndex)) return;
+          if (dragSrcIndex === targetIndex) return;
+          const moved = destinations.splice(dragSrcIndex, 1)[0];
+          destinations.splice(targetIndex, 0, moved);
+          dragSrcIndex = null;
+          renderList();
+        });
+
         ul.appendChild(li);
       });
     }
 
     function getCurrentPlanData() {
       syncTripTitle();
-      return { title: tripTitle, destinations };
+      return {
+        title: tripTitle,
+        destinations
+      };
     }
 
-    // ===== 長い共有リンク（バックアップ用） =====
+    // どこでも再現できる長い共有リンク
     function generateShareLink() {
       if (destinations.length === 0) {
-        alert("行き先が1つもありません。まず追加してください。");
+        alert('行き先が1つもありません。まず追加してください。');
         return;
       }
       const data = getCurrentPlanData();
       const json = JSON.stringify(data);
       const b64 = btoa(encodeURIComponent(json));
 
-      const base = window.location.origin + window.location.pathname.replace(/index\.html$/, "");
+      const base = window.location.href.split('?')[0].split('#')[0];
       const url = `${base}?plan=${b64}`;
 
-      const input = document.getElementById("longLinkInput");
-      if (input) input.value = url;
+      const container = document.getElementById('shareLink');
+      container.textContent = url;
 
-      setStatusMessage("バックアップ用の長い共有リンクを作成しました。必要に応じてコピーして保管してください。");
+      navigator.clipboard?.writeText(url).catch(() => {});
     }
 
-    // ===== Firestore 短縮リンク（おすすめ） =====
-    async function generateShortCloudLink() {
-      if (!db) {
-        alert("クラウド保存用の初期化に失敗しました。ページを再読み込みしてください。");
-        return;
-      }
+    // このブラウザ限定の短縮リンク（localStorage）
+    function generateShortLocalLink() {
       if (destinations.length === 0) {
-        alert("行き先が1つもありません。まず追加してください。");
+        alert('行き先が1つもありません。まず追加してください。');
         return;
       }
-
       const data = getCurrentPlanData();
+
+      let stored = {};
       try {
-        setStatusMessage("クラウドに保存中…");
-        const docRef = await db.collection("tabimemoPlans").add({
-          ...data,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        const shortId = docRef.id;
-
-        const base = window.location.origin + window.location.pathname.replace(/index\.html$/, "");
-        const url = `${base}?p=${encodeURIComponent(shortId)}`;
-
-        const input = document.getElementById("shortLinkInput");
-        if (input) input.value = url;
-
-        setStatusMessage("短い共有リンクを作成しました。「コピー」ボタンから共有できます。");
+        stored = JSON.parse(localStorage.getItem('tripPlans') || '{}');
       } catch (e) {
-        console.error(e);
-        setStatusMessage("クラウド保存に失敗しました。時間をおいて再度お試しください。");
+        stored = {};
       }
-    }
 
-    // ===== クリップボードコピー =====
-    function copyToClipboardById(inputId) {
-      const input = document.getElementById(inputId);
-      if (!input) return;
-      const value = input.value.trim();
-      if (!value) {
-        alert("まだリンクが作成されていません。先に「リンクを作成」を押してください。");
+      const id = 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+      stored[id] = data;
+
+      try {
+        localStorage.setItem('tripPlans', JSON.stringify(stored));
+      } catch (e) {
+        alert('ブラウザの保存容量の制限により、短縮リンクを保存できませんでした。');
         return;
       }
 
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(value)
-          .then(() => setStatusMessage("リンクをコピーしました。"))
-          .catch(() => {
-            input.select();
-            document.execCommand("copy");
-            setStatusMessage("リンクをコピーしました。");
-          });
-      } else {
-        input.select();
-        document.execCommand("copy");
-        setStatusMessage("リンクをコピーしました。");
-      }
+      const base = window.location.href.split('?')[0].split('#')[0];
+      const url = `${base}#p=${id}`;
+
+      const container = document.getElementById('shortLink');
+      container.textContent = url;
+
+      navigator.clipboard?.writeText(url).catch(() => {});
     }
 
-    function copyShortLink() {
-      copyToClipboardById("shortLinkInput");
+    // ---- Google Places 連携 ----
+    let gmAutocomplete;
+    let gmPlacesService;
+
+    function initGooglePlaces() {
+      const input = document.getElementById('gmSearchInput');
+      if (!input || !window.google || !google.maps || !google.maps.places) return;
+
+      const hiddenMapDiv = document.createElement('div');
+      hiddenMapDiv.style.display = 'none';
+      document.body.appendChild(hiddenMapDiv);
+
+      const map = new google.maps.Map(hiddenMapDiv, {
+        center: { lat: 35.0, lng: 135.0 },
+        zoom: 5
+      });
+
+      gmPlacesService = new google.maps.places.PlacesService(map);
+
+      gmAutocomplete = new google.maps.places.Autocomplete(input, {
+        fields: ['place_id', 'name', 'formatted_address'],
+        // 日本に絞る場合は下のコメントアウトを外す
+        // componentRestrictions: { country: 'jp' }
+      });
+
+      gmAutocomplete.addListener('place_changed', handlePlaceChanged);
     }
 
-    function copyLongLink() {
-      copyToClipboardById("longLinkInput");
-    }
+    function handlePlaceChanged() {
+      if (!gmAutocomplete) return;
+      const place = gmAutocomplete.getPlace();
+      if (!place || !place.place_id) return;
 
-    // ===== URL から復元 =====
-    async function restoreFromUrl() {
-      const params = new URLSearchParams(window.location.search);
-      const planParam = params.get("plan");
-      let shortParam = params.get("p");
+      const request = {
+        placeId: place.place_id,
+        fields: ['url', 'name', 'formatted_address']
+      };
 
-      if (!shortParam && window.location.hash.startsWith("#p=")) {
-        shortParam = window.location.hash.slice(3);
-      }
-
-      if (planParam) {
-        try {
-          const json = decodeURIComponent(atob(planParam));
-          const parsed = JSON.parse(json);
-          if (parsed && Array.isArray(parsed.destinations)) {
-            destinations = parsed.destinations;
-            tripTitle = parsed.title || "";
-            document.getElementById("tripTitleInput").value = tripTitle;
-            renderList();
-            setStatusMessage("URL から行程を読み込みました。");
-            scrollToListIfNeeded();
-          }
-        } catch (e) {
-          console.error("plan 読み込み失敗", e);
+      gmPlacesService.getDetails(request, (detail, status) => {
+        if (status !== google.maps.places.PlacesServiceStatus.OK || !detail) {
+          console.warn('Place details の取得に失敗しました', status);
+          return;
         }
-        return;
-      }
 
-      if (shortParam) {
-        try {
-          setStatusMessage("クラウドから行程を読み込み中…");
-          const docSnap = await db.collection("tabimemoPlans").doc(shortParam).get();
-          if (docSnap.exists) {
-            const data = docSnap.data() || {};
-            destinations = Array.isArray(data.destinations) ? data.destinations : [];
-            tripTitle = data.title || "";
-            document.getElementById("tripTitleInput").value = tripTitle;
-            renderList();
-            setStatusMessage("クラウドから行程を読み込みました。");
-            scrollToListIfNeeded();
-          } else {
-            setStatusMessage("指定された短縮リンクの行程が見つかりませんでした。");
-          }
-        } catch (e) {
-          console.error("p 読み込み失敗", e);
-          setStatusMessage("クラウドからの読み込みに失敗しました。時間をおいて再度お試しください。");
+        const titleInput = document.getElementById('titleInput');
+        const urlInput = document.getElementById('urlInput');
+
+        if (titleInput) {
+          titleInput.value = detail.name || '';
         }
-      } else {
-        renderList();
-      }
+        if (urlInput) {
+          urlInput.value = detail.url || '';
+        }
+      });
     }
-
-    // ===== 初期化 =====
-    document.addEventListener("DOMContentLoaded", () => {
-      fillTimeSelects();
-      restoreFromUrl();
-    });
   </script>
+
+  <!-- ❗ここが Google Maps / Places 用の読み込み。YOUR_API_KEY_HERE をあなたのキーに差し替えてください -->
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBp3cXlnetWCkLe0NJBMm_PIfZ42MMvUrE&libraries=places&callback=initGooglePlaces"
+    async
+    defer
+  ></script>
 </body>
 </html>
