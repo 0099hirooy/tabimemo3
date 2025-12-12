@@ -483,39 +483,33 @@
 
   <!-- Google Maps Places API（ここだけ差し替え） -->
   <script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBp3cXlnetWCkLe0NJBMm_PIfZ42MMvUrE&libraries=places"
+    src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places"
     async defer></script>
 
   <script>
     /***********************
-     * Firebase Config（あなたの値に置換）
+     * Firebase Config（反映済み）
      ***********************/
     const firebaseConfig = {
-      apiKey: "YOUR_FIREBASE_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID",
-      measurementId: "OPTIONAL"
+      apiKey: "AIzaSyBAB8cAmmnn0VgAmlCO0M6xKcvP7uAWi64",
+      authDomain: "tabimemo-842cb.firebaseapp.com",
+      projectId: "tabimemo-842cb",
+      storageBucket: "tabimemo-842cb.firebasestorage.app",
+      messagingSenderId: "689688201634",
+      appId: "1:689688201634:web:49c603cda4ac758aa34afb",
+      measurementId: "G-MDH61JPWSB"
     };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    const plansCol = db.collection("tabimemoPlans"); // editKey不要
+    const plansCol = db.collection("tabimemoPlans");
 
-    /***********************
-     * State
-     ***********************/
     let destinations = [];
     let editingIndex = null;
     let selectedPlace = null; // {name, placeId, mapUrl}
     let autocompleteService = null;
     let currentPlanId = null;
 
-    /***********************
-     * DOM
-     ***********************/
     const toastEl = document.getElementById('toast');
     const planTitleInput = document.getElementById('planTitle');
     const planTitleBig = document.getElementById('planTitleBig');
@@ -543,9 +537,6 @@
     const copyBtn = document.getElementById('copyBtn');
     const shareBtn = document.getElementById('shareBtn');
 
-    /***********************
-     * Utils
-     ***********************/
     function showToast(msg){
       toastEl.textContent = msg;
       toastEl.classList.add('show');
@@ -615,13 +606,11 @@
       }
     }
 
-    // GitHub Pagesでも安定するbase URL（末尾は / に寄せる）
     function getBaseUrl(){
       const base = location.origin + location.pathname.replace(/index\.html$/,'');
       return base.endsWith('/') ? base : (base + '/');
     }
 
-    // iOS対策：Clipboard API + execCommand。失敗しても「表示」で共有可能。
     async function copyText(text){
       try{
         if (navigator.clipboard && window.isSecureContext) {
@@ -659,33 +648,23 @@
       shareUrlInput.value = url;
       shareUrlInput.onclick = () => { shareUrlInput.focus(); shareUrlInput.select(); };
 
-      copyBtn.onclick = async () => {
-        // ユーザー操作直後なので成功率が上がる
-        await copyText(url);
-      };
+      copyBtn.onclick = async () => { await copyText(url); };
 
       shareBtn.onclick = async () => {
-        // Web Share API（スマホで最強）
         if (navigator.share) {
           try{
             await navigator.share({ title: 'TABIMEMO', text: label || 'TABIMEMO 共有リンク', url });
             showToast('共有しました');
             return;
-          }catch(_){
-            // キャンセル等は黙ってコピーへ
-          }
+          }catch(_){}
         }
-        // shareが無い/失敗 → コピーにフォールバック
         await copyText(url);
       };
 
-      // できるだけ自動コピーも試す（失敗してもOK）
+      // 自動コピーは「できたらラッキー」。失敗してもURL欄が出るので共有は可能。
       copyText(url);
     }
 
-    /***********************
-     * Time selectors init
-     ***********************/
     function initTimeSelectors(){
       for(let h=0; h<24; h++){
         const v = String(h).padStart(2,'0');
@@ -703,9 +682,6 @@
       }
     }
 
-    /***********************
-     * Places
-     ***********************/
     function ensurePlaces(){
       if(window.google && google.maps && google.maps.places){
         if(!autocompleteService){
@@ -749,11 +725,10 @@
 
     function choosePrediction(pred){
       closePanel();
-
       const name = pred.structured_formatting?.main_text || pred.description || '';
       spotNameInput.value = name;
 
-      // スマホでも確実に開く形式
+      // スマホでも確実に開くURL形式
       selectedPlace = {
         name,
         placeId: pred.place_id,
@@ -796,9 +771,6 @@
       }
     });
 
-    /***********************
-     * Add / Edit
-     ***********************/
     function clearForm(){
       spotNameInput.value = '';
       selectedPlace = null;
@@ -880,9 +852,6 @@
     clearBtn.addEventListener('click', clearForm);
     planTitleInput.addEventListener('input', updateTitleBig);
 
-    /***********************
-     * Render list
-     ***********************/
     function renderList(){
       updateTitleBig();
       updateShareStatus();
@@ -1015,9 +984,6 @@
       });
     }
 
-    /***********************
-     * Share
-     ***********************/
     longShareBtn.addEventListener('click', async () => {
       if(destinations.length === 0){
         alert('行き先を追加してください。');
@@ -1068,9 +1034,6 @@
       }
     });
 
-    /***********************
-     * Load from URL
-     ***********************/
     async function loadFromUrl(){
       const params = new URLSearchParams(location.search);
       const planParam = params.get('plan');
@@ -1142,9 +1105,6 @@
       }
     }
 
-    /***********************
-     * Init
-     ***********************/
     initTimeSelectors();
     updateTitleBig();
     updateShareStatus();
@@ -1153,4 +1113,3 @@
   </script>
 </body>
 </html>
-
