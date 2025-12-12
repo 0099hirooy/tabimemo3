@@ -146,7 +146,7 @@
 
     textarea{ min-height: 60px; resize:vertical; }
 
-    ::placeholder{ color:#b6b6b6; } /* 薄いグレー */
+    ::placeholder{ color:#b6b6b6; }
 
     /* 到着予定：1行を基本に（スマホは許可） */
     .eta-row{
@@ -232,7 +232,7 @@
     }
 
     .item{
-      background: var(--item);         /* 白 */
+      background: var(--item);
       border-radius: 14px;
       border: 1px dashed rgba(242, 215, 122, .9);
       padding: 10px 10px 9px;
@@ -310,7 +310,6 @@
     }
     .action-btn:hover{ background: var(--btnHover); }
 
-    /* 共有 */
     .share-note{
       margin-top: 8px;
       font-size: 12px;
@@ -344,7 +343,7 @@
     @media (max-width: 640px){
       .tabimemo-title{ font-size: 30px; }
       .card{ padding: 14px 12px; border-radius: 16px; }
-      input, select, textarea{ font-size: 16px; } /* iOSの拡大防止＆見やすさ */
+      input, select, textarea{ font-size: 16px; } /* iOS拡大防止＆見やすさ */
       .plan-title-big{ font-size: 22px; }
       .time{ font-size: 17px; }
       .spot{ font-size: 15px; }
@@ -449,9 +448,8 @@
       <div id="shareStatus" class="share-status"></div>
 
       <div class="share-note">
-        ・ボタンを押すとクリップボードにコピーされます。<br>
         ・短いリンク：Firestoreに保存して共有（スマホ/PCどちらでもOK）<br>
-        ・このページを「短い共有リンク（?p=）」から開いた場合、押すと<strong>同じプランに上書き保存</strong>します（受け取った側も編集可能）。<br>
+        ・短い共有リンク（?p=）から開いた場合、短い共有リンクボタンを押すと<strong>同じプランに上書き保存</strong>します（受け取った側も編集可能）。<br>
         ・長いリンク：データをURLに埋め込み（長くなります）
       </div>
     </section>
@@ -471,41 +469,20 @@
 
   <script>
     /***********************
-     * Firebase Config
+     * Firebase Config（あなたの値に置換）
      ***********************/
     const firebaseConfig = {
-      apiKey: "AIzaSyBAB8cAmmnn0VgAmlCO0M6xKcvP7uAWi64",
-      authDomain: "tabimemo-842cb.firebaseapp.com",
-      projectId: "tabimemo-842cb",
-      storageBucket: "tabimemo-842cb.firebasestorage.app",
-      messagingSenderId: "689688201634",
-      appId: "1:689688201634:web:49c603cda4ac758aa34afb",
-      measurementId: "G-MDH61JPWSB"
+      apiKey: "YOUR_FIREBASE_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
     };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    const plansCol = db.collection("tabimemoPlans");
-
-    /***********************
-     * Security: editKey generator
-     ***********************/
-    function generateEditKey(){
-      const buf = new Uint8Array(24);
-      crypto.getRandomValues(buf);
-      return btoa(String.fromCharCode(...buf))
-        .replaceAll('=', '')
-        .replaceAll('+', '-')
-        .replaceAll('/', '_');
-    }
-
-    /***********************
-     * URL params (p/k/plan)
-     ***********************/
-    const urlParams = new URLSearchParams(location.search);
-    const initialP = urlParams.get('p');
-    const initialK = urlParams.get('k');
-    const initialPlan = urlParams.get('plan');
+    const plansCol = db.collection("tabimemoPlans"); // ← editKey不要の運用コレクション
 
     /***********************
      * State
@@ -514,12 +491,7 @@
     let editingIndex = null;
     let selectedPlace = null; // {name, placeId, mapUrl}
     let autocompleteService = null;
-
-    // 共有リンク (?p=) のIDを保持（上書き保存用）
-    let currentPlanId = initialP || null;
-
-    // 編集キー（k付きURLで来た場合のみ保持）
-    let currentEditKey = initialK || null;
+    let currentPlanId = null; // ?p= で開いたID（上書き保存用）
 
     /***********************
      * DOM
@@ -556,13 +528,36 @@
       setTimeout(() => toastEl.classList.remove('show'), 1800);
     }
 
+    // iOS対策：Clipboard APIが落ちてもコピーできるフォールバック
     async function copyText(text){
       try{
-        await navigator.clipboard.writeText(text);
-        showToast('リンクをコピーしました');
-      }catch{
-        showToast('コピーに失敗しました');
-      }
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+          showToast('リンクをコピーしました');
+          return true;
+        }
+      }catch(_) {}
+
+      try{
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        ta.style.top = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        ta.setSelectionRange(0, ta.value.length);
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        if(ok){
+          showToast('リンクをコピーしました');
+          return true;
+        }
+      }catch(_) {}
+
+      showToast('コピーに失敗しました（長押しでコピーしてください）');
+      return false;
     }
 
     function safeTrim(v){ return (v || '').toString().trim(); }
@@ -622,11 +617,7 @@
 
     function updateShareStatus(){
       if(currentPlanId){
-        if(currentEditKey){
-          shareStatus.textContent = `共有プランを編集中（ID: ${currentPlanId}）— 短い共有リンクボタンで上書き保存できます。`;
-        }else{
-          shareStatus.textContent = `閲覧モード（ID: ${currentPlanId}）— 編集するには「k付き（編集用）」リンクで開いてください。`;
-        }
+        shareStatus.textContent = `共有プランを編集中（ID: ${currentPlanId}）— 短い共有リンクボタンで上書き保存できます。`;
       }else{
         shareStatus.textContent = `通常モード — 短い共有リンクボタンで新規保存して共有できます。`;
       }
@@ -705,7 +696,7 @@
       const name = pred.structured_formatting?.main_text || pred.description || '';
       spotNameInput.value = name;
 
-      // ★スマホでも確実に開くURL形式へ
+      // ★スマホでも確実に開く形式（query_place_id）
       selectedPlace = {
         name,
         placeId: pred.place_id,
@@ -863,7 +854,6 @@
         const links = document.createElement('div');
         links.className = 'links';
 
-        // Googleマップ：短いURL付きで表示
         if(d.mapUrl){
           const a = document.createElement('a');
           a.href = d.mapUrl;
@@ -978,61 +968,62 @@
       }
       const base = location.origin + location.pathname.replace(/index\.html$/,'');
       const url = `${base}?plan=${encodePlan(currentPlanPayload())}`;
+      shareStatus.innerHTML = `<div style="margin-top:6px;font-weight:900;">長い共有リンク</div>
+        <div style="margin-top:6px;padding:10px;border:1px solid #d1d5db;border-radius:10px;background:#fff;word-break:break-all;">${url}</div>`;
       await copyText(url);
     });
 
-    // ★安全化：編集キー（k）を持つ人だけ上書き保存できる
+    // editKey不要：保存できればURL表示＋コピー（コピー失敗でも共有できる）
     shortShareBtn.addEventListener('click', async () => {
       if(destinations.length === 0){
         alert('行き先を追加してください。');
         return;
       }
 
-      const payload = currentPlanPayload();
-      const base = location.origin + location.pathname.replace(/index\.html$/,'');
+      shareStatus.textContent = '保存中…（数秒お待ちください）';
 
       try{
-        // 既存プランを開いているが k が無い（閲覧リンク）＝編集不可
-        if(currentPlanId && !currentEditKey){
-          alert('このリンクは閲覧用です（編集キーがありません）。編集用リンク（k付き）で開いてください。');
-          return;
-        }
+        const payload = currentPlanPayload();
+        const base = location.origin + location.pathname.replace(/index\.html$/,'');
+        let url = '';
 
         if(currentPlanId){
-          // 上書き保存（editKey必須）
           await plansCol.doc(currentPlanId).set({
             title: payload.title || '',
             destinations: payload.destinations || [],
-            editKey: currentEditKey,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-          }, { merge: false });
+          }, { merge: true });
 
-          const url = `${base}?p=${currentPlanId}&k=${currentEditKey}`;
-          await copyText(url);
-          showToast('上書き保存しました');
+          url = `${base}?p=${currentPlanId}`;
         }else{
-          // 新規保存（editKeyを生成）
-          const editKey = generateEditKey();
-
           const doc = await plansCol.add({
             title: payload.title || '',
             destinations: payload.destinations || [],
-            editKey,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           });
-
           currentPlanId = doc.id;
-          currentEditKey = editKey;
-
-          const url = `${base}?p=${currentPlanId}&k=${currentEditKey}`;
-          await copyText(url);
-          showToast('保存して共有リンクを作成しました');
+          url = `${base}?p=${doc.id}`;
         }
 
+        shareStatus.innerHTML = `
+          <div style="margin-top:6px;font-weight:900;">短い共有リンク（タップでコピー）</div>
+          <div id="shareLinkBox"
+               style="margin-top:6px;padding:10px;border:1px solid #d1d5db;border-radius:10px;background:#fff;word-break:break-all;cursor:pointer;">
+            ${url}
+          </div>
+          <div style="margin-top:6px;font-size:12px;color:#6b7280;">
+            ※iPhoneでコピーできない場合は、上のリンクを長押し→コピーしてください。
+          </div>
+        `;
+        document.getElementById('shareLinkBox').addEventListener('click', () => copyText(url));
+
+        await copyText(url);
         updateShareStatus();
+
       }catch(e){
         console.error(e);
-        alert('短い共有リンクの作成／保存に失敗しました。Firestoreルール（editKey対応）と設定を確認してください。');
+        shareStatus.textContent = '短い共有リンクの作成／保存に失敗しました。Firestoreルール（tabimemoPlans）を確認してください。';
+        alert('短い共有リンクの作成／保存に失敗しました。Firestore設定を確認してください。');
       }
     });
 
@@ -1040,8 +1031,9 @@
      * Load from URL
      ***********************/
     async function loadFromUrl(){
-      const planParam = initialPlan;
-      const pParam = initialP;
+      const params = new URLSearchParams(location.search);
+      const planParam = params.get('plan');
+      const pParam = params.get('p');
 
       if(planParam){
         const data = decodePlan(planParam);
@@ -1056,14 +1048,9 @@
             alert('共有データが見つかりませんでした。');
             return;
           }
-
           currentPlanId = pParam;
-          // ★k があれば編集モード（保存可能）
-          currentEditKey = initialK || null;
-
           const raw = snap.data() || {};
-          const data = raw.payload && typeof raw.payload === 'object' ? raw.payload : raw;
-          applyPlanData(data, true);
+          applyPlanData(raw, true);
 
           setTimeout(() => {
             document.getElementById('section-list').scrollIntoView({ behavior:'smooth' });
@@ -1075,17 +1062,14 @@
       }
     }
 
-    // ★スマホ向けURL補正（既存データも含む）
+    // 旧データも吸収しつつ、スマホで開けるMaps URLへ統一
     function normalizeDestinations(arr){
       if(!Array.isArray(arr)) return [];
       return arr.map(d => {
         const title = d.title || '';
         const placeId = d.placeId || '';
-
-        // 旧形式吸収
         let mapUrl = d.mapUrl || d.url || '';
 
-        // placeIdがあるなら、スマホでも確実なユニバーサル形式へ統一
         if(placeId){
           mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(title)}&query_place_id=${placeId}`;
         }
