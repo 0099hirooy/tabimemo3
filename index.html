@@ -200,14 +200,18 @@
       align-items: flex-start;
       justify-content: space-between;
       gap: 8px;
-      padding: 8px 0;
-      border-bottom: 1px dashed #eab308;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      background: #ffffff;
+      border-radius: 10px;
+      border: 1px dashed #fde68a;
     }
     .dest-item[draggable="true"] {
       cursor: grab;
     }
     .dest-item.drag-over {
-      border-bottom: 2px solid #16a34a;
+      border-color: #16a34a;
+      box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.25);
     }
     .dest-main {
       flex: 1;
@@ -241,20 +245,6 @@
       padding: 3px 8px;
       font-size: 0.75rem;
     }
-    .share-link {
-      font-size: 0.8rem;
-      word-break: break-all;
-      margin-top: 6px;
-      padding: 6px 8px;
-      border-radius: 8px;
-      background: #fefce8;
-      border: 1px dashed #eab308;
-    }
-    .share-label {
-      font-size: 0.8rem;
-      font-weight: 600;
-      margin-top: 8px;
-    }
     .note-text {
       font-size: 0.78rem;
       color: #4b5563;
@@ -281,11 +271,40 @@
       flex-wrap: wrap;
     }
     .plan-title-display {
-      font-size: 0.9rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 10px;
+    }
+
+    /* 共有 UI 用 */
+    .share-section {
+      margin-bottom: 12px;
+    }
+    .share-heading {
+      font-size: 0.85rem;
       font-weight: 600;
+      margin-bottom: 4px;
       color: #374151;
+    }
+    .share-generate-btn {
+      margin-top: 4px;
       margin-bottom: 6px;
     }
+    .share-input-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .share-input {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 999px;
+      border: 1px solid #d4d4d8;
+      font-size: 0.8rem;
+      background: #ffffff;
+    }
+
     @media (min-width: 720px) {
       body { padding: 32px 24px 48px; }
       h1 { font-size: 2.4rem; }
@@ -379,21 +398,43 @@
     <div class="card">
       <h2>③ 仲間と共有</h2>
 
-      <button class="btn-secondary" onclick="generateShareLink()">
-        長い共有リンクを作成（どの端末でも再現可）
-      </button>
-      <div class="share-label">長い共有リンク：</div>
-      <div id="shareLink" class="share-link"></div>
+      <!-- 短い共有リンク（おすすめ） -->
+      <div class="share-section">
+        <div class="share-heading">おすすめ：短い共有リンク</div>
+        <button class="btn-primary share-generate-btn" onclick="generateShortCloudLink()">
+          短いリンクを作成
+        </button>
+        <div class="share-input-row">
+          <input
+            id="shortLinkInput"
+            class="share-input"
+            placeholder="ここに短いURLが表示されます"
+            readonly
+          />
+          <button class="btn-secondary small-btn" onclick="copyShortLink()">コピー</button>
+        </div>
+      </div>
 
-      <button class="btn-secondary" onclick="generateShortCloudLink()">
-        短い共有リンクを作成（どの端末でも再現可・クラウド保存）
-      </button>
-      <div class="share-label">短い共有リンク：</div>
-      <div id="shortLink" class="share-link"></div>
+      <!-- 長い共有リンク（バックアップ用） -->
+      <div class="share-section">
+        <div class="share-heading">バックアップ用：長い共有リンク</div>
+        <button class="btn-secondary share-generate-btn" onclick="generateShareLink()">
+          長いリンクを作成
+        </button>
+        <div class="share-input-row">
+          <input
+            id="longLinkInput"
+            class="share-input"
+            placeholder="ここに長いURLが表示されます"
+            readonly
+          />
+          <button class="btn-secondary small-btn" onclick="copyLongLink()">コピー</button>
+        </div>
+      </div>
 
       <p class="note-text">
-        ・長いリンク：URLに行程データ全部を埋め込む方式。どこに送っても再現できます（かなり長くなります）。<br />
-        ・短いリンク：行程データをクラウド（Firestore）に保存し、「?p=XXXX」形式の短いURLで呼び出します。
+        ・短い共有リンク：行程データをクラウド（Firestore）に保存し、「?p=XXXX」形式の短いURLで呼び出します。<br />
+        ・長い共有リンク：URLに行程データ全部を埋め込む方式。どこに送っても再現できる“バックアップ用”です。
       </p>
       <p id="statusMessage" class="status-message"></p>
     </div>
@@ -478,7 +519,6 @@
         return;
       }
 
-      // ETA ロジック
       let eta = "";
       if (hour && !minute) {
         eta = `${hour}:00`;
@@ -560,7 +600,6 @@
       renderList();
     }
 
-    // URL 表示用（先頭20文字＋…）
     function getShortUrlText(url) {
       if (!url) return "";
       if (url.length <= 20) return url;
@@ -632,7 +671,6 @@
         const li = document.createElement("li");
         li.className = "dest-item";
 
-        // DnD 設定（編集中はドラッグ無効）
         if (editingIndex === null) {
           li.draggable = true;
           li.dataset.index = i;
@@ -649,7 +687,6 @@
         main.className = "dest-main";
 
         if (editingIndex === i) {
-          // 編集モード
           const titleLabel = document.createElement("div");
           titleLabel.textContent = "行き先を編集";
           titleLabel.style.fontWeight = "600";
@@ -730,7 +767,6 @@
 
           main.appendChild(btnRow);
         } else {
-          // 通常表示
           const title = document.createElement("div");
           title.className = "dest-title";
           const label = d.title || "(タイトルなし)";
@@ -827,7 +863,7 @@
       return { title: tripTitle, destinations };
     }
 
-    // ===== 長い共有リンク =====
+    // ===== 長い共有リンク（バックアップ用） =====
     function generateShareLink() {
       if (destinations.length === 0) {
         alert("行き先が1つもありません。まず追加してください。");
@@ -840,14 +876,13 @@
       const base = window.location.origin + window.location.pathname.replace(/index\.html$/, "");
       const url = `${base}?plan=${b64}`;
 
-      const container = document.getElementById("shareLink");
-      container.textContent = url;
+      const input = document.getElementById("longLinkInput");
+      if (input) input.value = url;
 
-      navigator.clipboard?.writeText(url).catch(() => {});
-      setStatusMessage("長い共有リンクをコピーしました。");
+      setStatusMessage("バックアップ用の長い共有リンクを作成しました。必要に応じてコピーして保管してください。");
     }
 
-    // ===== Firestore 短縮リンク =====
+    // ===== Firestore 短縮リンク（おすすめ） =====
     async function generateShortCloudLink() {
       if (!db) {
         alert("クラウド保存用の初期化に失敗しました。ページを再読み込みしてください。");
@@ -870,15 +905,47 @@
         const base = window.location.origin + window.location.pathname.replace(/index\.html$/, "");
         const url = `${base}?p=${encodeURIComponent(shortId)}`;
 
-        const container = document.getElementById("shortLink");
-        container.textContent = url;
+        const input = document.getElementById("shortLinkInput");
+        if (input) input.value = url;
 
-        navigator.clipboard?.writeText(url).catch(() => {});
-        setStatusMessage("短い共有リンクをクラウドに保存し、コピーしました。");
+        setStatusMessage("短い共有リンクを作成しました。「コピー」ボタンから共有できます。");
       } catch (e) {
         console.error(e);
         setStatusMessage("クラウド保存に失敗しました。時間をおいて再度お試しください。");
       }
+    }
+
+    // ===== クリップボードコピー =====
+    function copyToClipboardById(inputId) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      const value = input.value.trim();
+      if (!value) {
+        alert("まだリンクが作成されていません。先に「リンクを作成」を押してください。");
+        return;
+      }
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(value)
+          .then(() => setStatusMessage("リンクをコピーしました。"))
+          .catch(() => {
+            input.select();
+            document.execCommand("copy");
+            setStatusMessage("リンクをコピーしました。");
+          });
+      } else {
+        input.select();
+        document.execCommand("copy");
+        setStatusMessage("リンクをコピーしました。");
+      }
+    }
+
+    function copyShortLink() {
+      copyToClipboardById("shortLinkInput");
+    }
+
+    function copyLongLink() {
+      copyToClipboardById("longLinkInput");
     }
 
     // ===== URL から復元 =====
