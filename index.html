@@ -185,6 +185,11 @@
     }
     .btn-primary:hover{ background:#1d4ed8; }
 
+    /* 折りたたみボタン（既存ボタンと統一） */
+    #toggleDetailsBtn{
+      margin-top: 12px;
+    }
+
     .ac-wrap{ position:relative; }
     .ac-panel{
       position:absolute;
@@ -366,28 +371,22 @@
       .eta-row select{ width: 48%; min-width: 140px; }
       .eta-row .eta-note{ width: 100%; white-space:normal; }
     }
-/* ===== スマホ横スクロール完全防止 ===== */
-html, body{
-  width: 100%;
-  overflow-x: hidden;
-}
 
-.wrap{
-  overflow-x: hidden;
-}
-
-/* バッジや共有URLが原因でのはみ出し防止 */
-.tabimemo-badge{
-  max-width: 100%;
-  min-width: 0;
-}
-
-.share-input{
-  max-width: 100%;
-  word-break: break-all;
-  overflow-wrap: anywhere;
-}
-
+    /* ===== スマホ横スクロール完全防止 ===== */
+    html, body{
+      width: 100%;
+      overflow-x: hidden;
+    }
+    .wrap{ overflow-x: hidden; }
+    .tabimemo-badge{
+      max-width: 100%;
+      min-width: 0;
+    }
+    .share-input{
+      max-width: 100%;
+      word-break: break-all;
+      overflow-wrap: anywhere;
+    }
   </style>
 </head>
 
@@ -434,27 +433,32 @@ html, body{
         <div class="eta-note">例：10:00 / 13:30</div>
       </div>
 
-      <label for="transport">前の地点からの移動手段</label>
-      <select id="transport">
-        <option value="">（最初の地点 or 未設定）</option>
-        <option value="徒歩">徒歩</option>
-        <option value="自転車">自転車</option>
-        <option value="車">車</option>
-        <option value="電車">電車</option>
-        <option value="バス">バス</option>
-        <option value="タクシー">タクシー</option>
-        <option value="飛行機">飛行機</option>
-        <option value="船">船</option>
-      </select>
+      <!-- ▼ ここから折りたたみ -->
+      <button id="toggleDetailsBtn" type="button">その他詳細も記入する（開く）</button>
+      <div id="detailsArea" style="display:none; margin-top:6px;">
+        <label for="transport">前の地点からの移動手段</label>
+        <select id="transport">
+          <option value="">（最初の地点 or 未設定）</option>
+          <option value="徒歩">徒歩</option>
+          <option value="自転車">自転車</option>
+          <option value="車">車</option>
+          <option value="電車">電車</option>
+          <option value="バス">バス</option>
+          <option value="タクシー">タクシー</option>
+          <option value="飛行機">飛行機</option>
+          <option value="船">船</option>
+        </select>
 
-      <label for="travelMinutes">前の地点からの移動時間（分）</label>
-      <input id="travelMinutes" type="number" min="0" placeholder="例：25（Googleマップの結果をそのまま）" />
+        <label for="travelMinutes">前の地点からの移動時間（分）</label>
+        <input id="travelMinutes" type="number" min="0" placeholder="例：25（Googleマップの結果をそのまま）" />
 
-      <label for="otherLink">その他リンク（任意：公式HP、予約、資料など）</label>
-      <input id="otherLink" type="url" placeholder="例：https://example.com（複数ある場合はメモ欄に追記でもOK）" />
+        <label for="otherLink">その他リンク（任意：公式HP、予約、資料など）</label>
+        <input id="otherLink" type="url" placeholder="例：https://example.com（複数ある場合はメモ欄に追記でもOK）" />
 
-      <label for="note">メモ（任意）</label>
-      <textarea id="note" placeholder="例：集合は南改札／駐車場は西側／チケット要予約 など"></textarea>
+        <label for="note">メモ（任意）</label>
+        <textarea id="note" placeholder="例：集合は南改札／駐車場は西側／チケット要予約 など"></textarea>
+      </div>
+      <!-- ▲ ここまで折りたたみ -->
 
       <div class="btn-row">
         <button id="addBtn" class="btn-primary" type="button">リストに追加</button>
@@ -541,6 +545,11 @@ html, body{
 
     const etaHour = document.getElementById('etaHour');
     const etaMinute = document.getElementById('etaMinute');
+
+    // ▼ 折りたたみ関連
+    const toggleDetailsBtn = document.getElementById('toggleDetailsBtn');
+    const detailsArea = document.getElementById('detailsArea');
+
     const transport = document.getElementById('transport');
     const travelMinutes = document.getElementById('travelMinutes');
     const otherLink = document.getElementById('otherLink');
@@ -633,6 +642,16 @@ html, body{
       return base.endsWith('/') ? base : (base + '/');
     }
 
+    // ▼ 折りたたみ制御
+    function setDetailsOpen(open){
+      detailsArea.style.display = open ? 'block' : 'none';
+      toggleDetailsBtn.textContent = open ? 'その他詳細も記入する（閉じる）' : 'その他詳細も記入する（開く）';
+    }
+    toggleDetailsBtn.addEventListener('click', () => {
+      const isOpen = detailsArea.style.display !== 'none';
+      setDetailsOpen(!isOpen);
+    });
+
     async function copyText(text){
       try{
         if (navigator.clipboard && window.isSecureContext) {
@@ -683,7 +702,6 @@ html, body{
         await copyText(url);
       };
 
-      // 自動コピーは「できたらラッキー」。失敗してもURL欄が出るので共有は可能。
       copyText(url);
     }
 
@@ -804,6 +822,7 @@ html, body{
       editingIndex = null;
       addBtn.textContent = 'リストに追加';
       closePanel();
+      setDetailsOpen(false); // ★クリアで閉じる
     }
 
     function startEdit(i){
@@ -818,6 +837,10 @@ html, body{
       travelMinutes.value = (d.travelMinutes ?? '') === null ? '' : (d.travelMinutes ?? '');
       otherLink.value = d.otherLink || '';
       note.value = d.note || '';
+
+      // ★詳細が入っていたら自動で開く
+      const hasDetails = !!(d.transport || d.travelMinutes || d.otherLink || d.note);
+      setDetailsOpen(hasDetails);
 
       addBtn.textContent = '更新';
       showToast('編集モード');
@@ -866,7 +889,7 @@ html, body{
         destinations.push(data);
       }
 
-      clearForm();
+      clearForm();      // ★追加/更新で閉じる
       renderList();
     }
 
@@ -1130,6 +1153,10 @@ html, body{
     initTimeSelectors();
     updateTitleBig();
     updateShareStatus();
+
+    // 初期は閉じる
+    setDetailsOpen(false);
+
     renderList();
     loadFromUrl();
   </script>
