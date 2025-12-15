@@ -366,6 +366,28 @@
       .eta-row select{ width: 48%; min-width: 140px; }
       .eta-row .eta-note{ width: 100%; white-space:normal; }
     }
+/* ===== スマホ横スクロール完全防止 ===== */
+html, body{
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.wrap{
+  overflow-x: hidden;
+}
+
+/* バッジや共有URLが原因でのはみ出し防止 */
+.tabimemo-badge{
+  max-width: 100%;
+  min-width: 0;
+}
+
+.share-input{
+  max-width: 100%;
+  word-break: break-all;
+  overflow-wrap: anywhere;
+}
+
   </style>
 </head>
 
