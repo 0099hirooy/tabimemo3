@@ -2,9 +2,69 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>ルートさん｜みんなの行程係。</title>
+
+  <!-- ★SEO最強：title（キーワード含む） -->
+  <title>ルートさん｜行程・旅程を作成して共有できる無料ルート管理ツール</title>
+
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="ルートさん（みんなの行程係。）旅や出張の行程を、行き先検索→リスト化→共有リンクでかんたん共有。Day別管理にも対応。" />
+
+  <!-- ★SEO最強：description（行程/旅程/作成/ルート/共有を自然に含める） -->
+  <meta name="description" content="行程・旅程をかんたんに作成・管理・共有できる無料ツール『ルートさん』。旅行や出張のルート作成、Day別行程表、共有リンクでの共同編集に対応。" />
+
+  <!-- ★SEO最強：canonical（末尾/必須） -->
+  <link rel="canonical" href="https://0099hirooy.github.io/tabimemo3/" />
+
+  <!-- ★SEO最強：robots -->
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+  <meta name="googlebot" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+
+  <!-- ★SEO最強：OGP -->
+  <meta property="og:locale" content="ja_JP" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="ルートさん" />
+  <meta property="og:title" content="ルートさん｜行程・旅程を作成して共有できる無料ルート管理ツール" />
+  <meta property="og:description" content="行程・旅程をかんたんに作成・管理・共有。旅行/出張のルート作成、Day別行程表、共有リンクでの共同編集に対応。" />
+  <meta property="og:url" content="https://0099hirooy.github.io/tabimemo3/" />
+  <!-- 画像を用意できたら最強（1200x630推奨） -->
+  <!-- <meta property="og:image" content="https://0099hirooy.github.io/tabimemo3/ogp.png" /> -->
+
+  <!-- ★SEO最強：Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="ルートさん｜行程・旅程を作成して共有できる無料ルート管理ツール" />
+  <meta name="twitter:description" content="行程・旅程をかんたんに作成・管理・共有。旅行/出張のルート作成、Day別行程表、共有リンクでの共同編集に対応。" />
+  <!-- <meta name="twitter:image" content="https://0099hirooy.github.io/tabimemo3/ogp.png" /> -->
+
+  <meta name="application-name" content="ルートさん" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="theme-color" content="#8dd63f" />
+
+  <!-- ★SEO最強：構造化データ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "ルートさん",
+    "alternateName": "みんなの行程係。",
+    "url": "https://0099hirooy.github.io/tabimemo3/",
+    "applicationCategory": "TravelApplication",
+    "operatingSystem": "Web",
+    "browserRequirements": "Requires JavaScript. Works on modern browsers.",
+    "inLanguage": "ja",
+    "description": "行程・旅程をかんたんに作成・管理・共有できる無料ツール。旅行や出張のルート作成、Day別行程表、共有リンクでの共同編集に対応。",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "JPY"
+    },
+    "featureList": [
+      "行き先検索（Google Places）",
+      "行程のリスト化・並び替え",
+      "Day別管理（Day1/Day2/Day3…）",
+      "短い共有リンク（Firestore保存）",
+      "長い共有リンク（URL埋め込み）"
+    ]
+  }
+  </script>
 
   <!-- favicon（丸いロゴを簡易でSVG化） -->
   <link rel="icon" type="image/svg+xml"
@@ -64,7 +124,7 @@
     .tabimemo-badge{
       position: relative;
       padding: 14px 22px;
-      border-radius: 22px;   /* 少し丸く */
+      border-radius: 22px;
       background: #fff;
       border: 4px solid #ffd400;
       box-shadow: var(--shadow);
@@ -230,7 +290,7 @@
     .ac-main{ font-weight: 900; }
     .ac-sub{ margin-top:2px; font-size: 12px; color: var(--muted); }
 
-    /* ===== Day tabs（追加） ===== */
+    /* ===== Day tabs ===== */
     .daybar{
       display:flex;
       align-items:center;
@@ -316,7 +376,7 @@
 
     .item-main{
       flex: 1 1 auto;
-      min-width: 0; /* ← 保険：項目の横幅を最大限使うために重要 */
+      min-width: 0; /* 既存の挙動維持の保険 */
     }
 
     .day-badge{
@@ -334,16 +394,16 @@
       margin-bottom: 2px;
     }
 
-    /* ★統合変更：行き先（spot）は横幅いっぱいまで使い、不要に折り返さない */
+    /* ★要望対応：行き先名は「すぐ折り返さない」＝1行で見せる（長い場合は…） */
     .spot{
       font-size: 14px;
       font-weight: 900;
       color:#374151;
       margin-bottom: 4px;
 
-      white-space: pre-wrap;        /* 改行は保持 */
-      overflow-wrap: break-word;    /* はみ出る時だけ折り返す（URL等） */
-      word-break: normal;           /* 日本語をむやみに途中で割らない */
+      white-space: nowrap;        /* 折り返さない */
+      overflow: hidden;           /* はみ出しは隠す（レイアウト維持） */
+      text-overflow: ellipsis;    /* …で省略（見やすさ最優先） */
     }
 
     .links{
@@ -366,16 +426,17 @@
       color: var(--muted);
     }
 
-    /* ★統合変更：やること（meta）は横幅いっぱいまで使い、改行を表示に反映 */
+    /* ★要望対応：やること等（meta）は改行は出すが、無理な分割折り返しを抑える */
     .meta{
       margin-top: 6px;
       font-size: 12px;
       color: var(--muted);
-      line-height: 1.5;
+      line-height:1.5;
 
-      white-space: pre-wrap;        /* textareaの改行をそのまま表示 */
-      overflow-wrap: break-word;    /* はみ出る時だけ折り返す（URL等） */
-      word-break: normal;           /* 日本語をむやみに途中で割らない */
+      white-space: pre-wrap;      /* 入力の改行はそのまま表示 */
+      word-break: normal;         /* むやみに途中で割らない */
+      overflow-wrap: break-word;  /* URL等がはみ出すときだけ折り返す */
+      line-break: strict;         /* 日本語の不自然な改行を減らす方向 */
     }
 
     .actions{
@@ -483,10 +544,8 @@
       .eta-row select{ width: 48%; min-width: 140px; }
       .eta-row .eta-note{ width: 100%; white-space:normal; }
 
-      /* スマホでアクションが縦に伸びすぎないように */
       .actions .action-btn{ padding: 7px 10px; }
 
-      /* 共有URLのはみ出し防止 */
       .share-input{ overflow-wrap:anywhere; }
     }
 
@@ -533,7 +592,7 @@
       </div>
       <div class="hint">※ 候補を選ぶと GoogleマップURL が自動でセットされます（画面を離れません）。</div>
 
-      <!-- ★統合変更：やることは textarea（改行入力できる） -->
+      <!-- 追加：やること（改行入力OK） -->
       <label for="todo">やること（任意）</label>
       <textarea id="todo" placeholder="例：受付で集合&#10;資料を受け取る&#10;撮影&#10;ランチ予約 など"></textarea>
 
@@ -590,7 +649,7 @@
       <h2>③ 行き先リスト</h2>
       <div id="planTitleBig" class="plan-title-big">プランタイトル未設定</div>
 
-      <!-- Dayバー（追加） -->
+      <!-- Dayバー -->
       <div class="daybar">
         <div class="day-tabs" id="dayTabs">
           <button type="button" class="day-tab is-active" data-day="day1">Day1</button>
@@ -628,7 +687,6 @@
 
       <div id="shareStatus" class="share-status"></div>
 
-      <!-- 短い共有リンク：ボタン直下（要望） -->
       <div id="shortShareBox" class="share-box" style="display:none;">
         <div class="hint" style="margin-top:0;">短い共有リンク（Firestoreに保存）</div>
         <input id="shortShareUrlInput" class="share-input" type="text" readonly />
@@ -639,7 +697,6 @@
         <div class="hint">※コピーできない場合は、URL欄をタップ→長押し→コピーでOKです。</div>
       </div>
 
-      <!-- 長い共有リンク：ボタン直下（従来通り） -->
       <div id="longShareBox" class="share-box" style="display:none;">
         <div class="hint" style="margin-top:0;">長い共有リンク（URLに埋め込み）</div>
         <input id="longShareUrlInput" class="share-input" type="text" readonly />
@@ -673,7 +730,6 @@
   <script>
     /***********************
      * Firebase Config
-     * ※あなたのfirebaseConfigをここに入れてOK（今のままでもOK）
      ***********************/
     const firebaseConfig = {
       apiKey: "AIzaSyBAB8cAmmnn0VgAmlCO0M6xKcvP7uAWi64",
@@ -868,7 +924,6 @@
         await copyText(url);
       };
 
-      // 自動コピー（できたらOK）
       copyText(url);
     }
 
@@ -955,7 +1010,6 @@
       const name = pred.structured_formatting?.main_text || pred.description || '';
       spotNameInput.value = name;
 
-      // スマホでも確実に開くURL形式
       selectedPlace = {
         name,
         placeId: pred.place_id,
@@ -1097,13 +1151,12 @@
     planTitleInput.addEventListener('input', updateTitleBig);
 
     /***********************
-     * Day UI（＋→Day4〜Day10）
+     * Day UI
      ***********************/
     function ensureDayTab(dayKey){
       if(destinationsByDay[dayKey] === undefined){
         destinationsByDay[dayKey] = [];
       }
-      // すでにタブがあるなら追加しない
       if(dayTabs.querySelector(`.day-tab[data-day="${dayKey}"]`)) return;
 
       const btn = document.createElement('button');
@@ -1134,7 +1187,6 @@
     });
 
     dayPlusBtn.addEventListener('click', () => {
-      // プルダウンを出すだけ（最小変更）
       daySelect.style.display = (daySelect.style.display === 'block') ? 'none' : 'block';
       daySelect.value = '';
     });
@@ -1149,7 +1201,7 @@
     });
 
     /***********************
-     * Render list（先頭だけDay表示 + 先頭は集合/出発地点）
+     * Render list
      ***********************/
     function renderList(){
       updateTitleBig();
@@ -1158,7 +1210,6 @@
 
       const list = getActiveDestinations();
 
-      // ガイド（3つ薄い候補） ※空の時のみ
       if(list.length === 0){
         const guide = document.createElement('div');
         guide.className = 'item';
@@ -1186,7 +1237,6 @@
         const left = document.createElement('div');
         left.className = 'item-main';
 
-        // 先頭行だけ Day 表示
         if(i === 0){
           const dayBadge = document.createElement('div');
           dayBadge.className = 'day-badge';
@@ -1201,11 +1251,11 @@
         const spot = document.createElement('div');
         spot.className = 'spot';
         spot.textContent = d.title || '名称未設定';
+        spot.title = d.title || ''; /* 省略表示でも長押し/ホバーで全文確認できる（レイアウト不変） */
 
         const links = document.createElement('div');
         links.className = 'links';
 
-        // Googleマップ：スマホで縦に伸びすぎないように短文化
         if(d.mapUrl){
           const a = document.createElement('a');
           a.href = d.mapUrl;
@@ -1323,13 +1373,11 @@
      * Share（短い／長い）
      ***********************/
     longShareBtn.addEventListener('click', async () => {
-      // Day全体を共有（旅行全体）
       const url = `${getBaseUrl()}?plan=${encodePlan(currentPlanPayload())}`;
       showLongShareUI(url);
     });
 
     shortShareBtn.addEventListener('click', async () => {
-      // Day全体を保存（旅行全体）
       shareStatus.textContent = '保存中…（数秒お待ちください）';
 
       try{
@@ -1356,8 +1404,6 @@
         }
 
         updateShareStatus();
-
-        // 「短いの下に短いURL」を確実に
         showShortShareUI(url);
 
       }catch(e){
@@ -1399,15 +1445,12 @@
     function applyPlanData(data, fromShare){
       planTitleInput.value = data.title || '';
 
-      // 新：destinationsByDay、旧：destinations は day1 に吸収
       if(data.destinationsByDay && typeof data.destinationsByDay === 'object'){
         destinationsByDay = {};
         Object.keys(data.destinationsByDay).forEach(k => {
           destinationsByDay[k] = normalizeDestinations(data.destinationsByDay[k]);
-          // Day4+ があればタブ追加
           ensureDayTab(k);
         });
-        // 最低限 day1〜3 を確保
         if(destinationsByDay.day1 === undefined) destinationsByDay.day1 = [];
         if(destinationsByDay.day2 === undefined) destinationsByDay.day2 = [];
         if(destinationsByDay.day3 === undefined) destinationsByDay.day3 = [];
@@ -1419,7 +1462,6 @@
         };
       }
 
-      // 現在Dayは day1 を基本に（崩さない）
       setActiveDay('day1');
 
       if(fromShare){
