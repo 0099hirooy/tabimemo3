@@ -2,8 +2,33 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>TABIMEMO</title>
+  <title>ルートさん｜みんなの行程係。</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- SEO最小セット（無料） -->
+  <meta name="description" content="ルートさん｜みんなの行程係。行き先候補を入力するとGoogleマップ候補が出て、行程をサクッと作って短い共有リンクで編集共有できます。" />
+  <meta name="robots" content="index,follow" />
+  <link rel="canonical" href="./" />
+
+  <!-- ファビコン（インラインSVG：丸っこい「ル」風） -->
+  <link rel="icon" type="image/svg+xml"
+    href='data:image/svg+xml;utf8,
+    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64">
+      <defs>
+        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="%23b4ec51"/>
+          <stop offset="1" stop-color="%238dd63f"/>
+        </linearGradient>
+      </defs>
+      <rect x="4" y="4" width="56" height="56" rx="16" fill="url(%23g)" stroke="%23ffd400" stroke-width="4"/>
+      <circle cx="20" cy="20" r="4" fill="%231d4ed8" opacity=".35"/>
+      <circle cx="38" cy="28" r="4" fill="%23ef4444" opacity=".30"/>
+      <circle cx="26" cy="40" r="4" fill="%231d4ed8" opacity=".25"/>
+      <path d="M22 18 h18 a6 6 0 0 1 6 6 v4 a12 12 0 0 1-12 12 h-12 z"
+            fill="%23ffffff" opacity=".92"/>
+      <path d="M28 24 h12 a3 3 0 0 1 3 3 v2 a8 8 0 0 1-8 8 h-7 z"
+            fill="%23000000" opacity=".14"/>
+    </svg>' />
 
   <style>
     :root{
@@ -19,9 +44,19 @@
       --btnHover:#f3f4f6;
       --link:#1d4ed8;
       --shadow: 0 2px 8px rgba(0,0,0,.10);
+      --danger:#ef4444;
     }
 
     *{ box-sizing:border-box; }
+
+    /* ===== スマホ横ブレ完全防止 ===== */
+    html, body{
+      width: 100%;
+      overflow-x: hidden;
+      overscroll-behavior-x: none;
+      touch-action: pan-y;
+    }
+
     body{
       margin:0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -33,8 +68,10 @@
       max-width: 980px;
       margin: 0 auto;
       padding: 16px 12px 40px;
+      overflow-x:hidden;
     }
 
+    /* ===== ヘッダー（ルートさん） ===== */
     .hero{
       display:flex;
       flex-direction:column;
@@ -43,20 +80,21 @@
       margin: 6px 0 16px;
     }
 
-    .tabimemo-badge{
+    .badge{
       position: relative;
-      padding: 14px 22px;
-      border-radius: 18px;
+      padding: 14px 20px;
+      border-radius: 22px;
       background: #fff;
       border: 4px solid #ffd400;
       box-shadow: var(--shadow);
       text-align:center;
       min-width: 240px;
-      overflow:hidden;
       max-width: 100%;
+      overflow:hidden;
     }
 
-    .tabimemo-badge::before{
+    /* 青・赤の水玉（控えめ） */
+    .badge::before{
       content:"";
       position:absolute;
       inset:-20px;
@@ -69,34 +107,38 @@
       pointer-events:none;
     }
 
-    .tabimemo-title{
+    .brand{
       position:relative;
       z-index:1;
       margin:0;
       font-size: 34px;
       line-height: 1;
-      letter-spacing: .08em;
+      letter-spacing: .06em;
       font-weight: 900;
       text-shadow: 0 2px 0 rgba(0,0,0,.06);
+      border-radius: 18px; /* “ロゴを少し丸く” */
+      display:inline-block;
+      padding: 4px 10px;
     }
 
-    .hero-subtitle{
+    .subtitle{
       margin:0;
-      font-weight: 800;
+      font-weight: 900;
       font-size: 14px;
       color:#2b2b2b;
       text-align:center;
     }
 
-    .hero-desc{
+    .desc{
       margin:0;
       font-size: 13px;
       color: #2b2b2b;
       text-align:center;
       line-height: 1.55;
-      max-width: 720px;
+      max-width: 760px;
     }
 
+    /* ===== カード ===== */
     .card{
       background: var(--card);
       border: 1px solid var(--cardBorder);
@@ -125,7 +167,8 @@
       display:block;
       margin-top: 10px;
       font-size: 12px;
-      font-weight: 800;
+      font-weight: 900;
+      color:#111827;
     }
 
     input[type="text"],
@@ -140,10 +183,11 @@
       background:#fff;
       font-size: 14px;
       outline:none;
+      max-width:100%;
     }
 
     textarea{ min-height: 60px; resize:vertical; }
-    ::placeholder{ color:#b6b6b6; }
+    ::placeholder{ color:#b6b6b6; } /* 薄いグレー */
 
     .eta-row{
       display:flex;
@@ -170,11 +214,11 @@
 
     button{
       border-radius: 999px;
-      padding: 9px 14px;
+      padding: 10px 14px; /* 親指ゾーン：少し厚め */
       border:1px solid var(--btnBorder);
       background: var(--btnBg);
       cursor:pointer;
-      font-weight: 800;
+      font-weight: 900;
       font-size: 13px;
     }
     button:hover{ background: var(--btnHover); }
@@ -186,16 +230,21 @@
     }
     .btn-primary:hover{ background:#1d4ed8; }
 
-    /* 折りたたみボタン（既存UIに溶け込ませる） */
-    #detailToggleBtn{
-      width:100%;
-      text-align:center;
+    /* 詳細の折りたたみ */
+    .details-toggle{
       margin-top: 10px;
+      width: 100%;
+      text-align:left;
     }
-    #detailFields{
+    .details{
       margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(0,0,0,.12);
+      display:none;
     }
+    .details.show{ display:block; }
 
+    /* ===== オートコンプリート ===== */
     .ac-wrap{ position:relative; }
     .ac-panel{
       position:absolute;
@@ -221,11 +270,13 @@
     .ac-main{ font-weight: 900; }
     .ac-sub{ margin-top:2px; font-size: 12px; color: var(--muted); }
 
+    /* ===== リスト ===== */
     .plan-title-big{
-      font-size: 22px;
-      font-weight: 900;
+      font-size: 24px; /* “タイトルを大きく” */
+      font-weight: 1000;
       margin: 0 0 10px;
       color:#111827;
+      word-break: break-word;
     }
 
     .list{
@@ -240,6 +291,7 @@
       border: 1px dashed rgba(242, 215, 122, .9);
       padding: 10px 10px 9px;
       user-select:none;
+      max-width:100%;
     }
 
     .item-top{
@@ -247,6 +299,7 @@
       align-items:flex-start;
       justify-content:space-between;
       gap: 10px;
+      max-width:100%;
     }
 
     .item-main{
@@ -254,32 +307,30 @@
       min-width: 0;
     }
 
+    .badge-start{
+      display:inline-block;
+      margin-bottom: 6px;
+      font-size: 12px;
+      font-weight: 1000;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(255, 212, 0, .35);
+      border: 1px solid rgba(242, 215, 122, .9);
+    }
+
     .time{
       font-size: 16px;
-      font-weight: 900;
+      font-weight: 1000;
       color:#111827;
       margin-bottom: 2px;
     }
 
     .spot{
       font-size: 14px;
-      font-weight: 900;
-      color:#374151;
+      font-weight: 1000;
+      color:#374151; /* “行先リストの文字もグレー”寄り */
       margin-bottom: 4px;
       word-break: break-word;
-    }
-
-    /* 先頭（集合・出発地点）ラベル */
-    .start-badge{
-      display:inline-block;
-      margin-bottom: 6px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(209,213,219,.9);
-      background: #f9fafb;
-      color: #374151;
-      font-size: 12px;
-      font-weight: 900;
     }
 
     .links{
@@ -293,7 +344,8 @@
       text-decoration:none;
       border-bottom: 1px dotted rgba(29, 78, 216, .45);
       font-size: 13px;
-      font-weight: 800;
+      font-weight: 900;
+      overflow-wrap:anywhere;
     }
 
     .meta{
@@ -302,49 +354,60 @@
       color: var(--muted);
       line-height:1.4;
       word-break: break-word;
+      overflow-wrap:anywhere;
     }
 
+    /* 操作：横並び＋折返しOK（スマホで横ブレしない） */
     .actions{
       display:flex;
       flex-direction: row;
       gap: 6px;
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
       align-items:center;
-      white-space:nowrap;
+      justify-content:flex-end;
+      max-width: 100%;
     }
 
     .action-btn{
-      padding: 6px 10px;
+      padding: 8px 10px; /* スマホ押しやすさ */
       border-radius: 999px;
       border:1px solid var(--btnBorder);
       background:#fff;
-      font-weight: 900;
+      font-weight: 1000;
       font-size: 12px;
       line-height:1;
       color:#333;
+      min-width: 52px;
     }
     .action-btn:hover{ background: var(--btnHover); }
 
-    .share-note{
-      margin-top: 8px;
-      font-size: 12px;
-      color: var(--muted);
-      line-height:1.45;
+    .action-danger{
+      border-color: rgba(239, 68, 68, .35);
+      color: #111;
     }
+
+    /* ===== 共有UI（短い/長いを分ける） ===== */
     .share-status{
       margin-top: 8px;
       font-size: 12px;
-      font-weight: 900;
+      font-weight: 1000;
       color:#111827;
       line-height: 1.45;
     }
 
-    .share-box{
-      margin-top: 8px;
+    .share-block{
+      margin-top: 10px;
       padding: 10px;
       border: 1px solid #d1d5db;
-      border-radius: 10px;
+      border-radius: 12px;
       background:#fff;
+      max-width:100%;
+    }
+    .share-block h3{
+      margin:0 0 8px;
+      font-size: 13px;
+      font-weight: 1000;
+      color:#111827;
     }
     .share-input{
       width: 100%;
@@ -355,7 +418,7 @@
       background:#fff;
       word-break: break-all;
       overflow-wrap:anywhere;
-      max-width: 100%;
+      max-width:100%;
     }
     .share-actions{
       margin-top: 8px;
@@ -364,25 +427,11 @@
       flex-wrap: wrap;
     }
 
-    /* 空リスト用：薄い候補表示 */
-    .ghost{
-      padding: 12px 10px;
-      border-radius: 14px;
-      border: 1px dashed rgba(242, 215, 122, .9);
-      background: rgba(255,255,255,.65);
-      color: #9ca3af;
-      font-weight: 800;
-      font-size: 13px;
-      cursor: pointer;
-    }
-    .ghost:hover{
-      background: rgba(255,255,255,.85);
-    }
-    .ghost small{
-      display:block;
-      margin-top:4px;
-      font-weight:700;
-      color:#b6b6b6;
+    .share-note{
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height:1.45;
     }
 
     .toast{
@@ -399,29 +448,34 @@
       pointer-events:none;
       transition: opacity .2s ease;
       z-index: 5000;
+      max-width: 92vw;
+      text-align:center;
     }
     .toast.show{ opacity: 1; }
 
+    /* ===== スマホ微調整 ===== */
     @media (max-width: 640px){
-      .tabimemo-title{ font-size: 30px; }
+      .brand{ font-size: 30px; }
       .card{ padding: 14px 12px; border-radius: 16px; }
-      input, select, textarea{ font-size: 16px; }
-      .plan-title-big{ font-size: 22px; }
+      input, select, textarea{ font-size: 16px; } /* iOS拡大防止＆見やすさ */
+      .plan-title-big{ font-size: 24px; }
       .time{ font-size: 17px; }
       .spot{ font-size: 15px; }
       .eta-row{ flex-wrap:wrap; }
       .eta-row select{ width: 48%; min-width: 140px; }
       .eta-row .eta-note{ width: 100%; white-space:normal; }
-      .actions{ gap:8px; }
-      .action-btn{ padding: 8px 12px; } /* 親指ゾーン */
+      .item-top{ flex-wrap:wrap; } /* 横ブレ回避 */
+      .actions{ justify-content:flex-start; }
+      .action-btn{ min-width: 64px; }
+      button{ padding: 12px 14px; } /* 親指ゾーン */
     }
 
-    /* ===== スマホ横スクロール完全防止 ===== */
-    html, body{
-      width: 100%;
-      overflow-x: hidden;
+    /* プレースホルダー（リストの薄い候補） */
+    .placeholder{
+      opacity: .55;
+      filter: grayscale(0.15);
     }
-    .wrap{ overflow-x:hidden; }
+    .placeholder .links a{ pointer-events:none; }
   </style>
 </head>
 
@@ -429,23 +483,26 @@
   <div class="wrap">
 
     <div class="hero">
-      <div class="tabimemo-badge">
-        <h1 class="tabimemo-title">TABIMEMO</h1>
+      <div class="badge">
+        <h1 class="brand">ルートさん</h1>
       </div>
-      <p class="hero-subtitle">〜旅のルートや行程を一括管理して皆で共有〜</p>
-      <p class="hero-desc">
-        旅先や移動中に次の行先を検索する必要をなくしたい！<br>
-        旅や一日の移動行程をシンプルに見やすくを追求しました！
+      <p class="subtitle">みんなの行程係。</p>
+      <p class="desc">
+        行き先を入力すると候補が出て、行程をサクッと作成。<br>
+        短い共有リンクで、旅にも仕事にもそのまま共有・編集できます。
       </p>
     </div>
 
+    <!-- ① 基本情報 -->
     <section class="card" id="section-basic">
-      <h2>① 旅の基本情報</h2>
-      <label for="planTitle">旅のタイトル</label>
-      <input id="planTitle" type="text" placeholder="例：四国一周サーフトリップ／営業訪問ルート（東京）／徳島FW 1日目" />
+      <h2>① プラン基本情報</h2>
+      <label for="planTitle">プランタイトル</label>
+      <input id="planTitle" type="text"
+        placeholder="例：四国一周サーフトリップ／営業訪問ルート（東京）／徳島FW 1日目" />
       <div class="hint">※ 共有先ではタイトルが一番上に大きく表示されます。</div>
     </section>
 
+    <!-- ② 行き先追加 -->
     <section class="card" id="section-add">
       <h2>② 行き先を追加</h2>
 
@@ -468,10 +525,10 @@
         <div class="eta-note">例：10:00 / 13:30</div>
       </div>
 
-      <!-- 折りたたみトグル -->
-      <button id="detailToggleBtn" type="button">その他詳細も記入する（開く）</button>
+      <!-- 折りたたみ（移動手段〜メモまで） -->
+      <button id="detailsToggle" class="details-toggle" type="button">＋ その他詳細も記入する（移動手段・所要・リンク・メモ）</button>
+      <div id="details" class="details">
 
-      <div id="detailFields" style="display:none;">
         <label for="transport">前の地点からの移動手段</label>
         <select id="transport">
           <option value="">（最初の地点 or 未設定）</option>
@@ -486,13 +543,16 @@
         </select>
 
         <label for="travelMinutes">前の地点からの移動時間（分）</label>
-        <input id="travelMinutes" type="number" min="0" placeholder="例：25（Googleマップの結果をそのまま）" />
+        <input id="travelMinutes" type="number" min="0"
+          placeholder="例：25（Googleマップの結果をそのまま）" />
 
         <label for="otherLink">その他リンク（任意：公式HP、予約、資料など）</label>
-        <input id="otherLink" type="url" placeholder="例：https://example.com（複数ある場合はメモ欄に追記でもOK）" />
+        <input id="otherLink" type="url"
+          placeholder="例：https://example.com（複数ある場合はメモ欄に追記でもOK）" />
 
         <label for="note">メモ（任意）</label>
         <textarea id="note" placeholder="例：集合は南改札／駐車場は西側／チケット要予約 など"></textarea>
+
       </div>
 
       <div class="btn-row">
@@ -502,15 +562,17 @@
       <div class="hint">※ 編集中は「リストに追加」が「更新」に変わります。</div>
     </section>
 
+    <!-- ③ リスト -->
     <section class="card" id="section-list">
       <h2>③ 行き先リスト</h2>
       <div id="planTitleBig" class="plan-title-big">プランタイトル未設定</div>
       <div id="list" class="list"></div>
-      <div class="hint">・ドラッグで並び替えできます。・↑↓ 編集 削除も使えます。</div>
+      <div class="hint">・ドラッグで並び替えできます（PC推奨）。スマホは↑↓でもOK。・受け取った側も編集できます。</div>
     </section>
 
+    <!-- ④ 共有 -->
     <section class="card" id="section-share">
-      <h2>④ 仲間と共有</h2>
+      <h2>④ 共有</h2>
 
       <div class="btn-row">
         <button id="shortShareBtn" class="btn-primary" type="button">短い共有リンクを作成／上書き保存（推奨）</button>
@@ -519,32 +581,31 @@
 
       <div id="shareStatus" class="share-status"></div>
 
-      <!-- 短い共有リンク用（短いURLはここに出す） -->
-      <div id="shareBoxShort" class="share-box" style="display:none;">
-        <div class="hint" style="margin-top:0;">短い共有リンク</div>
-        <input id="shareUrlInputShort" class="share-input" type="text" readonly />
+      <!-- ★短いURLは短い欄の下に表示 -->
+      <div id="shortShareBlock" class="share-block" style="display:none;">
+        <h3>短い共有リンク（推奨）</h3>
+        <input id="shortShareInput" class="share-input" type="text" readonly />
         <div class="share-actions">
-          <button id="copyBtnShort" type="button">コピー</button>
-          <button id="shareBtnShort" type="button">共有（スマホ推奨）</button>
+          <button id="shortCopyBtn" type="button">コピー</button>
+          <button id="shortShareNativeBtn" type="button">共有（スマホ推奨）</button>
         </div>
-        <div class="hint">※コピーできない場合は、URL欄をタップ→長押し→コピーでOKです。</div>
+        <div class="hint">※ コピーできない場合は、URL欄をタップ→長押し→コピーでOKです。</div>
       </div>
 
-      <!-- 長い共有リンク用（長いURLはここに出す） -->
-      <div id="shareBoxLong" class="share-box" style="display:none;">
-        <div class="hint" style="margin-top:0;">長い共有リンク</div>
-        <input id="shareUrlInputLong" class="share-input" type="text" readonly />
+      <div id="longShareBlock" class="share-block" style="display:none;">
+        <h3>長い共有リンク（バックアップ用）</h3>
+        <input id="longShareInput" class="share-input" type="text" readonly />
         <div class="share-actions">
-          <button id="copyBtnLong" type="button">コピー</button>
-          <button id="shareBtnLong" type="button">共有（スマホ推奨）</button>
+          <button id="longCopyBtn" type="button">コピー</button>
+          <button id="longShareNativeBtn" type="button">共有（スマホ推奨）</button>
         </div>
-        <div class="hint">※コピーできない場合は、URL欄をタップ→長押し→コピーでOKです。</div>
+        <div class="hint">※ 長いリンクはURLが長くなります。</div>
       </div>
 
       <div class="share-note">
         ・短いリンク：Firestoreに保存して共有（スマホ/PCどちらでもOK）<br>
-        ・短い共有リンク（?p=）から開いた場合、短い共有リンクボタンを押すと<strong>同じプランに上書き保存</strong>します（受け取った側も編集可能）。<br>
-        ・長いリンク：データをURLに埋め込み（長くなります）
+        ・短い共有リンク（?p=）から開いた場合、短い共有リンクボタンを押すと<strong>同じプランに上書き保存</strong>します（受け取った側も編集可能）<br>
+        ・長いリンク：データをURLに埋め込み（バックアップ用）
       </div>
     </section>
 
@@ -563,7 +624,7 @@
 
   <script>
     /***********************
-     * Firebase Config（あなたの値のまま）
+     * Firebase Config（あなたの値でOK）
      ***********************/
     const firebaseConfig = {
       apiKey: "AIzaSyBAB8cAmmnn0VgAmlCO0M6xKcvP7uAWi64",
@@ -579,13 +640,54 @@
     const db = firebase.firestore();
     const plansCol = db.collection("tabimemoPlans");
 
+    /***********************
+     * State
+     ***********************/
     let destinations = [];
     let editingIndex = null;
     let selectedPlace = null; // {name, placeId, mapUrl}
     let autocompleteService = null;
     let currentPlanId = null;
 
+    // 初期候補（リストに薄い文字で3つ表示）
+    const placeholderDestinations = [
+      {
+        eta: "09:00",
+        title: "集合：〇〇駅（ここを出発地点に）",
+        mapUrl: "",
+        placeId: "",
+        transport: "",
+        travelMinutes: "",
+        otherLink: "",
+        note: "例：改札前集合／遅れそうなら連絡"
+      },
+      {
+        eta: "10:30",
+        title: "訪問先：A社 本社（打合せ）",
+        mapUrl: "",
+        placeId: "",
+        transport: "電車",
+        travelMinutes: 25,
+        otherLink: "https://example.com",
+        note: "例：受付で名刺／会議室は3F"
+      },
+      {
+        eta: "12:00",
+        title: "昼食：名物ランチ（近くで）",
+        mapUrl: "",
+        placeId: "",
+        transport: "徒歩",
+        travelMinutes: 8,
+        otherLink: "",
+        note: "例：混むなら予約／アレルギー注意"
+      }
+    ];
+
+    /***********************
+     * DOM
+     ***********************/
     const toastEl = document.getElementById('toast');
+
     const planTitleInput = document.getElementById('planTitle');
     const planTitleBig = document.getElementById('planTitleBig');
 
@@ -595,8 +697,8 @@
     const etaHour = document.getElementById('etaHour');
     const etaMinute = document.getElementById('etaMinute');
 
-    const detailToggleBtn = document.getElementById('detailToggleBtn');
-    const detailFields = document.getElementById('detailFields');
+    const detailsToggle = document.getElementById('detailsToggle');
+    const details = document.getElementById('details');
 
     const transport = document.getElementById('transport');
     const travelMinutes = document.getElementById('travelMinutes');
@@ -611,17 +713,19 @@
     const longShareBtn = document.getElementById('longShareBtn');
     const shareStatus = document.getElementById('shareStatus');
 
-    // ② 短い/長いの表示先を分ける
-    const shareBoxShort = document.getElementById('shareBoxShort');
-    const shareUrlInputShort = document.getElementById('shareUrlInputShort');
-    const copyBtnShort = document.getElementById('copyBtnShort');
-    const shareBtnShort = document.getElementById('shareBtnShort');
+    const shortShareBlock = document.getElementById('shortShareBlock');
+    const shortShareInput = document.getElementById('shortShareInput');
+    const shortCopyBtn = document.getElementById('shortCopyBtn');
+    const shortShareNativeBtn = document.getElementById('shortShareNativeBtn');
 
-    const shareBoxLong = document.getElementById('shareBoxLong');
-    const shareUrlInputLong = document.getElementById('shareUrlInputLong');
-    const copyBtnLong = document.getElementById('copyBtnLong');
-    const shareBtnLong = document.getElementById('shareBtnLong');
+    const longShareBlock = document.getElementById('longShareBlock');
+    const longShareInput = document.getElementById('longShareInput');
+    const longCopyBtn = document.getElementById('longCopyBtn');
+    const longShareNativeBtn = document.getElementById('longShareNativeBtn');
 
+    /***********************
+     * Utils
+     ***********************/
     function showToast(msg){
       toastEl.textContent = msg;
       toastEl.classList.add('show');
@@ -696,6 +800,7 @@
       return base.endsWith('/') ? base : (base + '/');
     }
 
+    // クリップボード（スマホ含め最大限）
     async function copyText(text){
       try{
         if (navigator.clipboard && window.isSecureContext) {
@@ -728,45 +833,22 @@
       return false;
     }
 
-    // ②：短い/長いで表示先を分離
-    function showShareUI(kind, url, label){
-      const isShort = (kind === 'short');
-      const box = isShort ? shareBoxShort : shareBoxLong;
-      const input = isShort ? shareUrlInputShort : shareUrlInputLong;
-      const cbtn = isShort ? copyBtnShort : copyBtnLong;
-      const sbtn = isShort ? shareBtnShort : shareBtnLong;
-
-      box.style.display = 'block';
-      input.value = url;
-      input.onclick = () => { input.focus(); input.select(); };
-
-      cbtn.onclick = async () => { await copyText(url); };
-
-      sbtn.onclick = async () => {
-        if (navigator.share) {
-          try{
-            await navigator.share({ title: 'TABIMEMO', text: label || 'TABIMEMO 共有リンク', url });
-            showToast('共有しました');
-            return;
-          }catch(_){}
-        }
-        await copyText(url);
-      };
-
-      // 自動コピーはできれば実行。失敗しても入力欄で共有できる。
-      copyText(url);
+    function setShareBlock(block, inputEl, url){
+      block.style.display = 'block';
+      inputEl.value = url;
+      inputEl.onclick = () => { inputEl.focus(); inputEl.select(); };
     }
 
-    /***********************
-     * 折りたたみ（移動手段〜メモ）
-     ***********************/
-    let detailOpen = false;
-    function setDetailOpen(open){
-      detailOpen = !!open;
-      detailFields.style.display = detailOpen ? 'block' : 'none';
-      detailToggleBtn.textContent = detailOpen ? 'その他詳細も記入する（閉じる）' : 'その他詳細も記入する（開く）';
+    async function nativeShareOrCopy(url, label){
+      if (navigator.share) {
+        try{
+          await navigator.share({ title: 'ルートさん', text: label || '共有リンク', url });
+          showToast('共有しました');
+          return;
+        }catch(_){}
+      }
+      await copyText(url);
     }
-    detailToggleBtn.addEventListener('click', () => setDetailOpen(!detailOpen));
 
     /***********************
      * Time selectors init
@@ -789,7 +871,26 @@
     }
 
     /***********************
-     * Places
+     * Details toggle
+     ***********************/
+    detailsToggle.addEventListener('click', () => {
+      const isOpen = details.classList.toggle('show');
+      detailsToggle.textContent = isOpen
+        ? '－ その他詳細を閉じる'
+        : '＋ その他詳細も記入する（移動手段・所要・リンク・メモ）';
+    });
+
+    function openDetailsIfNeeded(){
+      // 編集で詳細に値があるときは自動で開く
+      const hasAny = !!(safeTrim(transport.value) || safeTrim(travelMinutes.value) || safeTrim(otherLink.value) || safeTrim(note.value));
+      if(hasAny && !details.classList.contains('show')){
+        details.classList.add('show');
+        detailsToggle.textContent = '－ その他詳細を閉じる';
+      }
+    }
+
+    /***********************
+     * Places: init
      ***********************/
     function ensurePlaces(){
       if(window.google && google.maps && google.maps.places){
@@ -837,6 +938,7 @@
       const name = pred.structured_formatting?.main_text || pred.description || '';
       spotNameInput.value = name;
 
+      // スマホでも確実に開くURL形式
       selectedPlace = {
         name,
         placeId: pred.place_id,
@@ -855,6 +957,7 @@
         return;
       }
       if(!ensurePlaces()){
+        // APIが未ロード等
         return;
       }
 
@@ -893,7 +996,12 @@
       editingIndex = null;
       addBtn.textContent = 'リストに追加';
       closePanel();
-      setDetailOpen(false);
+
+      // 折りたたみは閉じる（ユーザーの視認性）
+      if(details.classList.contains('show')){
+        details.classList.remove('show');
+        detailsToggle.textContent = '＋ その他詳細も記入する（移動手段・所要・リンク・メモ）';
+      }
     }
 
     function startEdit(i){
@@ -910,7 +1018,8 @@
       note.value = d.note || '';
 
       addBtn.textContent = '更新';
-      setDetailOpen(true); // 編集時は開く
+      openDetailsIfNeeded();
+
       showToast('編集モード');
       document.getElementById('section-add').scrollIntoView({ behavior:'smooth' });
     }
@@ -966,54 +1075,53 @@
     planTitleInput.addEventListener('input', updateTitleBig);
 
     /***********************
-     * Empty list ghost examples (①)
+     * Render list
      ***********************/
-    const ghostExamples = [
-      { title: '集合・出発：駅の改札前', eta: '09:00' },
-      { title: '打合せ：取引先オフィス', eta: '10:30' },
-      { title: 'ランチ：近くのカフェ', eta: '12:00' },
-    ];
+    function normalizeDestinations(arr){
+      if(!Array.isArray(arr)) return [];
+      return arr.map(d => {
+        const title = d.title || '';
+        const placeId = d.placeId || '';
+        let mapUrl = d.mapUrl || d.url || '';
 
-    function renderGhost(){
-      listEl.innerHTML = '';
-      ghostExamples.forEach((ex) => {
-        const g = document.createElement('div');
-        g.className = 'ghost';
-        g.innerHTML = `${ex.eta}　${ex.title}<small>（タップでこの内容を入力できます）</small>`;
-        g.addEventListener('click', () => {
-          // クリックでフォームへ（編集モードに入れない／追加の下書き）
-          spotNameInput.value = ex.title;
-          selectedPlace = null;
-          setEta(ex.eta);
-          document.getElementById('section-add').scrollIntoView({ behavior:'smooth' });
-          showToast('例を入力しました（必要なら候補を選択してください）');
-        });
-        listEl.appendChild(g);
+        // placeIdがあるなら統一（スマホ互換）
+        if(placeId){
+          mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(title)}&query_place_id=${placeId}`;
+        }
+
+        const other = d.otherLink || d.webUrl || '';
+        return {
+          eta: d.eta || '',
+          title,
+          mapUrl,
+          placeId,
+          transport: d.transport || '',
+          travelMinutes: (d.travelMinutes ?? '') === null ? '' : (d.travelMinutes ?? ''),
+          otherLink: other,
+          note: d.note || ''
+        };
       });
     }
 
-    /***********************
-     * Render list (③: 先頭は集合・出発地点)
-     ***********************/
+    function ensurePlaceholders(){
+      // ① リストが空の時、薄い候補を3つ表示（ユーザーが追加したら消える）
+      if(destinations.length === 0){
+        return placeholderDestinations.map(x => ({...x, __placeholder:true}));
+      }
+      return destinations.map(x => ({...x, __placeholder:false}));
+    }
+
     function renderList(){
       updateTitleBig();
       updateShareStatus();
-
-      // 共有ボックスは、必要な方だけ開く仕様なので、ここで強制非表示にしない（保持）
-      // ただし、初回は見えないのでOK。
-
-      if(destinations.length === 0){
-        renderGhost();
-        initDnD();
-        return;
-      }
-
       listEl.innerHTML = '';
 
-      destinations.forEach((d, i) => {
+      const view = ensurePlaceholders();
+
+      view.forEach((d, i) => {
         const item = document.createElement('div');
-        item.className = 'item';
-        item.draggable = true;
+        item.className = 'item' + (d.__placeholder ? ' placeholder' : '');
+        item.draggable = !d.__placeholder;
         item.dataset.index = String(i);
 
         const main = document.createElement('div');
@@ -1022,11 +1130,12 @@
         const left = document.createElement('div');
         left.className = 'item-main';
 
+        // ③ 先頭は「集合/出発地点」
         if(i === 0){
-          const start = document.createElement('div');
-          start.className = 'start-badge';
-          start.textContent = '集合・出発地点';
-          left.appendChild(start);
+          const s = document.createElement('div');
+          s.className = 'badge-start';
+          s.textContent = '集合／出発地点';
+          left.appendChild(s);
         }
 
         const time = document.createElement('div');
@@ -1040,6 +1149,7 @@
         const links = document.createElement('div');
         links.className = 'links';
 
+        // Googleマップ：短いURL付きで表示
         if(d.mapUrl){
           const a = document.createElement('a');
           a.href = d.mapUrl;
@@ -1050,7 +1160,7 @@
         }else{
           const span = document.createElement('span');
           span.style.fontSize = '13px';
-          span.style.fontWeight = '800';
+          span.style.fontWeight = '900';
           span.style.color = '#6b7280';
           span.textContent = 'Googleマップ（未選択）';
           links.appendChild(span);
@@ -1081,30 +1191,40 @@
         const actions = document.createElement('div');
         actions.className = 'actions';
 
-        const up = document.createElement('button');
-        up.className = 'action-btn';
-        up.textContent = '↑';
-        up.addEventListener('click', () => moveItem(i, -1));
+        // プレースホルダーは操作不可にする（見本として）
+        if(d.__placeholder){
+          const b = document.createElement('span');
+          b.style.fontSize = '12px';
+          b.style.fontWeight = '900';
+          b.style.color = '#6b7280';
+          b.textContent = '（例）';
+          actions.appendChild(b);
+        }else{
+          const up = document.createElement('button');
+          up.className = 'action-btn';
+          up.textContent = '↑';
+          up.addEventListener('click', () => moveItem(i, -1));
 
-        const down = document.createElement('button');
-        down.className = 'action-btn';
-        down.textContent = '↓';
-        down.addEventListener('click', () => moveItem(i, 1));
+          const down = document.createElement('button');
+          down.className = 'action-btn';
+          down.textContent = '↓';
+          down.addEventListener('click', () => moveItem(i, 1));
 
-        const edit = document.createElement('button');
-        edit.className = 'action-btn';
-        edit.textContent = '編集';
-        edit.addEventListener('click', () => startEdit(i));
+          const edit = document.createElement('button');
+          edit.className = 'action-btn';
+          edit.textContent = '編集';
+          edit.addEventListener('click', () => startEdit(i));
 
-        const del = document.createElement('button');
-        del.className = 'action-btn';
-        del.textContent = '削除';
-        del.addEventListener('click', () => deleteItem(i));
+          const del = document.createElement('button');
+          del.className = 'action-btn action-danger';
+          del.textContent = '削除';
+          del.addEventListener('click', () => deleteItem(i));
 
-        actions.appendChild(up);
-        actions.appendChild(down);
-        actions.appendChild(edit);
-        actions.appendChild(del);
+          actions.appendChild(up);
+          actions.appendChild(down);
+          actions.appendChild(edit);
+          actions.appendChild(del);
+        }
 
         main.appendChild(left);
         main.appendChild(actions);
@@ -1115,11 +1235,14 @@
       initDnD();
     }
 
+    // PC中心。スマホは↑↓推奨（HTML5 DnDが端末により不安定）
     function initDnD(){
       const items = listEl.querySelectorAll('.item');
       let fromIndex = null;
 
       items.forEach(el => {
+        if(el.classList.contains('placeholder')) return;
+
         el.addEventListener('dragstart', (e) => {
           fromIndex = Number(el.dataset.index);
           e.dataTransfer.effectAllowed = 'move';
@@ -1153,7 +1276,14 @@
         return;
       }
       const url = `${getBaseUrl()}?plan=${encodePlan(currentPlanPayload())}`;
-      showShareUI('long', url, 'TABIMEMO（長い共有リンク）');
+
+      setShareBlock(longShareBlock, longShareInput, url);
+      longCopyBtn.onclick = () => copyText(url);
+      longShareNativeBtn.onclick = () => nativeShareOrCopy(url, 'ルートさん（長い共有リンク）');
+
+      // できれば自動コピー（失敗しても欄から手動コピー可能）
+      copyText(url);
+      showToast('長い共有リンクを生成しました');
     });
 
     shortShareBtn.addEventListener('click', async () => {
@@ -1188,7 +1318,14 @@
         }
 
         updateShareStatus();
-        showShareUI('short', url, 'TABIMEMO（短い共有リンク）');
+
+        // ★短いURLは短い欄に表示
+        setShareBlock(shortShareBlock, shortShareInput, url);
+        shortCopyBtn.onclick = () => copyText(url);
+        shortShareNativeBtn.onclick = () => nativeShareOrCopy(url, 'ルートさん（短い共有リンク）');
+
+        copyText(url);
+        showToast('短い共有リンクを作成しました');
 
       }catch(e){
         console.error(e);
@@ -1232,31 +1369,6 @@
       }
     }
 
-    function normalizeDestinations(arr){
-      if(!Array.isArray(arr)) return [];
-      return arr.map(d => {
-        const title = d.title || '';
-        const placeId = d.placeId || '';
-        let mapUrl = d.mapUrl || d.url || '';
-
-        if(placeId){
-          mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(title)}&query_place_id=${placeId}`;
-        }
-
-        const other = d.otherLink || d.webUrl || '';
-        return {
-          eta: d.eta || '',
-          title,
-          mapUrl,
-          placeId,
-          transport: d.transport || '',
-          travelMinutes: (d.travelMinutes ?? '') === null ? '' : (d.travelMinutes ?? ''),
-          otherLink: other,
-          note: d.note || ''
-        };
-      });
-    }
-
     function applyPlanData(data, fromShare){
       planTitleInput.value = data.title || '';
       destinations = normalizeDestinations(data.destinations);
@@ -1275,10 +1387,9 @@
      * Init
      ***********************/
     initTimeSelectors();
-    setDetailOpen(false);
     updateTitleBig();
     updateShareStatus();
-    renderList();
+    renderList();        // まずは薄い候補を表示
     loadFromUrl();
   </script>
 </body>
