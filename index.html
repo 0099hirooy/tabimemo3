@@ -476,6 +476,41 @@
       filter: grayscale(0.15);
     }
     .placeholder .links a{ pointer-events:none; }
+@media (max-width: 640px){
+  /* ① 1行の中で本文が潰れないように、操作ボタンを下段に回す */
+  .item-top{
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  /* ② 操作ボタンは右寄せで1行に、押しやすいサイズに */
+  .actions{
+    width: 100%;
+    justify-content: flex-end;
+    flex-wrap: wrap;      /* どうしても収まらない端末は折り返す */
+    gap: 8px;
+  }
+  .action-btn{
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  /* ③ リンクが「Go / og / le…」みたいに1～2文字で割れないように */
+  .links a{
+    display: inline-block;
+    max-width: 100%;
+    word-break: normal;        /* break-all を禁止 */
+    overflow-wrap: anywhere;   /* それでも長ければ“適切に”折る */
+    line-height: 1.35;
+  }
+
+  /* ④ タイトル/施設名も読みやすく */
+  .spot{
+    line-height: 1.25;
+  }
+}
+
   </style>
 </head>
 
