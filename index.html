@@ -315,8 +315,8 @@
     }
 
     .item-main{
-      flex:1;
-      min-width: 0;
+      flex: 1 1 auto;
+      min-width: 0; /* ← 保険：項目の横幅を最大限使うために重要 */
     }
 
     .day-badge{
@@ -334,12 +334,16 @@
       margin-bottom: 2px;
     }
 
+    /* ★統合変更：行き先（spot）は横幅いっぱいまで使い、不要に折り返さない */
     .spot{
       font-size: 14px;
       font-weight: 900;
       color:#374151;
       margin-bottom: 4px;
-      word-break: break-word;
+
+      white-space: pre-wrap;        /* 改行は保持 */
+      overflow-wrap: break-word;    /* はみ出る時だけ折り返す（URL等） */
+      word-break: normal;           /* 日本語をむやみに途中で割らない */
     }
 
     .links{
@@ -362,12 +366,16 @@
       color: var(--muted);
     }
 
+    /* ★統合変更：やること（meta）は横幅いっぱいまで使い、改行を表示に反映 */
     .meta{
       margin-top: 6px;
       font-size: 12px;
       color: var(--muted);
-      line-height:1.4;
-      word-break: break-word;
+      line-height: 1.5;
+
+      white-space: pre-wrap;        /* textareaの改行をそのまま表示 */
+      overflow-wrap: break-word;    /* はみ出る時だけ折り返す（URL等） */
+      word-break: normal;           /* 日本語をむやみに途中で割らない */
     }
 
     .actions{
@@ -525,9 +533,9 @@
       </div>
       <div class="hint">※ 候補を選ぶと GoogleマップURL が自動でセットされます（画面を離れません）。</div>
 
-      <!-- 追加：やること -->
+      <!-- ★統合変更：やることは textarea（改行入力できる） -->
       <label for="todo">やること（任意）</label>
-      <input id="todo" type="text" placeholder="例：受付で集合／資料を受け取る／撮影／ランチ予約 など" />
+      <textarea id="todo" placeholder="例：受付で集合&#10;資料を受け取る&#10;撮影&#10;ランチ予約 など"></textarea>
 
       <label>到着予定時間（任意）</label>
       <div class="eta-row">
