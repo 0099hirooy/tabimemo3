@@ -3,22 +3,16 @@
 <head>
   <meta charset="UTF-8" />
 
-  <!-- ★SEO最強：title（キーワード含む） -->
+  <!-- ===== SEO最強セット（GitHub Pages向け） ===== -->
   <title>ルートさん｜行程・旅程を作成して共有できる無料ルート管理ツール</title>
-
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- ★SEO最強：description（行程/旅程/作成/ルート/共有を自然に含める） -->
   <meta name="description" content="行程・旅程をかんたんに作成・管理・共有できる無料ツール『ルートさん』。旅行や出張のルート作成、Day別行程表、共有リンクでの共同編集に対応。" />
-
-  <!-- ★SEO最強：canonical（末尾/必須） -->
   <link rel="canonical" href="https://0099hirooy.github.io/tabimemo3/" />
 
-  <!-- ★SEO最強：robots -->
   <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
   <meta name="googlebot" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
 
-  <!-- ★SEO最強：OGP -->
   <meta property="og:locale" content="ja_JP" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="ルートさん" />
@@ -28,7 +22,6 @@
   <!-- 画像を用意できたら最強（1200x630推奨） -->
   <!-- <meta property="og:image" content="https://0099hirooy.github.io/tabimemo3/ogp.png" /> -->
 
-  <!-- ★SEO最強：Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="ルートさん｜行程・旅程を作成して共有できる無料ルート管理ツール" />
   <meta name="twitter:description" content="行程・旅程をかんたんに作成・管理・共有。旅行/出張のルート作成、Day別行程表、共有リンクでの共同編集に対応。" />
@@ -38,7 +31,6 @@
   <meta name="format-detection" content="telephone=no" />
   <meta name="theme-color" content="#8dd63f" />
 
-  <!-- ★SEO最強：構造化データ -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -65,6 +57,7 @@
     ]
   }
   </script>
+  <!-- ===== /SEO最強セット ===== -->
 
   <!-- favicon（丸いロゴを簡易でSVG化） -->
   <link rel="icon" type="image/svg+xml"
@@ -124,7 +117,7 @@
     .tabimemo-badge{
       position: relative;
       padding: 14px 22px;
-      border-radius: 22px;
+      border-radius: 22px;   /* 少し丸く */
       background: #fff;
       border: 4px solid #ffd400;
       box-shadow: var(--shadow);
@@ -290,7 +283,7 @@
     .ac-main{ font-weight: 900; }
     .ac-sub{ margin-top:2px; font-size: 12px; color: var(--muted); }
 
-    /* ===== Day tabs ===== */
+    /* ===== Day tabs（追加） ===== */
     .daybar{
       display:flex;
       align-items:center;
@@ -375,8 +368,8 @@
     }
 
     .item-main{
-      flex: 1 1 auto;
-      min-width: 0; /* 既存の挙動維持の保険 */
+      flex:1;
+      min-width: 0;
     }
 
     .day-badge{
@@ -394,16 +387,20 @@
       margin-bottom: 2px;
     }
 
-    /* ★要望対応：行き先名は「すぐ折り返さない」＝1行で見せる（長い場合は…） */
+    /* ★要望対応：白枠内いっぱいに使って、収まらなければ次の行へ */
     .spot{
       font-size: 14px;
       font-weight: 900;
       color:#374151;
       margin-bottom: 4px;
 
-      white-space: nowrap;        /* 折り返さない */
-      overflow: hidden;           /* はみ出しは隠す（レイアウト維持） */
-      text-overflow: ellipsis;    /* …で省略（見やすさ最優先） */
+      white-space: normal;
+      overflow: visible;
+      text-overflow: clip;
+
+      word-break: normal;
+      overflow-wrap: anywhere;
+      line-break: strict;
     }
 
     .links{
@@ -426,17 +423,17 @@
       color: var(--muted);
     }
 
-    /* ★要望対応：やること等（meta）は改行は出すが、無理な分割折り返しを抑える */
+    /* ★要望対応：やること等は全文表示。改行を保持し、枠内で折り返す */
     .meta{
       margin-top: 6px;
       font-size: 12px;
       color: var(--muted);
-      line-height:1.5;
+      line-height:1.4;
 
-      white-space: pre-wrap;      /* 入力の改行はそのまま表示 */
-      word-break: normal;         /* むやみに途中で割らない */
-      overflow-wrap: break-word;  /* URL等がはみ出すときだけ折り返す */
-      line-break: strict;         /* 日本語の不自然な改行を減らす方向 */
+      white-space: pre-wrap;
+      word-break: normal;
+      overflow-wrap: anywhere;
+      line-break: strict;
     }
 
     .actions{
@@ -592,8 +589,9 @@
       </div>
       <div class="hint">※ 候補を選ぶと GoogleマップURL が自動でセットされます（画面を離れません）。</div>
 
-      <!-- 追加：やること（改行入力OK） -->
+      <!-- 追加：やること（任意） -->
       <label for="todo">やること（任意）</label>
+      <!-- ★改行入力OK：textarea -->
       <textarea id="todo" placeholder="例：受付で集合&#10;資料を受け取る&#10;撮影&#10;ランチ予約 など"></textarea>
 
       <label>到着予定時間（任意）</label>
@@ -649,7 +647,7 @@
       <h2>③ 行き先リスト</h2>
       <div id="planTitleBig" class="plan-title-big">プランタイトル未設定</div>
 
-      <!-- Dayバー -->
+      <!-- Dayバー（追加） -->
       <div class="daybar">
         <div class="day-tabs" id="dayTabs">
           <button type="button" class="day-tab is-active" data-day="day1">Day1</button>
@@ -687,6 +685,7 @@
 
       <div id="shareStatus" class="share-status"></div>
 
+      <!-- 短い共有リンク：ボタン直下 -->
       <div id="shortShareBox" class="share-box" style="display:none;">
         <div class="hint" style="margin-top:0;">短い共有リンク（Firestoreに保存）</div>
         <input id="shortShareUrlInput" class="share-input" type="text" readonly />
@@ -697,6 +696,7 @@
         <div class="hint">※コピーできない場合は、URL欄をタップ→長押し→コピーでOKです。</div>
       </div>
 
+      <!-- 長い共有リンク：ボタン直下 -->
       <div id="longShareBox" class="share-box" style="display:none;">
         <div class="hint" style="margin-top:0;">長い共有リンク（URLに埋め込み）</div>
         <input id="longShareUrlInput" class="share-input" type="text" readonly />
@@ -730,6 +730,7 @@
   <script>
     /***********************
      * Firebase Config
+     * ※あなたのfirebaseConfigをここに入れてOK（今のままでもOK）
      ***********************/
     const firebaseConfig = {
       apiKey: "AIzaSyBAB8cAmmnn0VgAmlCO0M6xKcvP7uAWi64",
@@ -1151,7 +1152,7 @@
     planTitleInput.addEventListener('input', updateTitleBig);
 
     /***********************
-     * Day UI
+     * Day UI（＋→Day4〜Day10）
      ***********************/
     function ensureDayTab(dayKey){
       if(destinationsByDay[dayKey] === undefined){
@@ -1251,7 +1252,6 @@
         const spot = document.createElement('div');
         spot.className = 'spot';
         spot.textContent = d.title || '名称未設定';
-        spot.title = d.title || ''; /* 省略表示でも長押し/ホバーで全文確認できる（レイアウト不変） */
 
         const links = document.createElement('div');
         links.className = 'links';
