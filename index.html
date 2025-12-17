@@ -437,12 +437,11 @@
     }
 
     .actions{
-      display:flex;
-      flex-direction: row;
+      display: flex;
+      flex-direction: column;
       gap: 6px;
-      flex-wrap: nowrap;
-      align-items:center;
-      white-space:nowrap;
+      align-items: stretch;
+      white-space: nowrap;
     }
 
     .action-btn{
@@ -557,6 +556,15 @@
 
 <body>
   <div class="wrap">
+<footer style="
+  text-align: center;
+  font-size: 12px;
+  color: #6b7280;
+  padding: 16px 0;
+">
+  © 2025 ルートさん by Hiroo Yoshida
+</footer>
+
 
     <div class="hero">
       <div class="tabimemo-badge">
@@ -1305,30 +1313,18 @@
         const actions = document.createElement('div');
         actions.className = 'actions';
 
-        const up = document.createElement('button');
-        up.className = 'action-btn';
-        up.textContent = '↑';
-        up.addEventListener('click', () => moveItem(i, -1));
+        const editBtn = document.createElement('button');
+        editBtn.className = 'action-btn';
+        editBtn.textContent = '↑ 編集';
+        editBtn.addEventListener('click', () => startEdit(i));
 
-        const down = document.createElement('button');
-        down.className = 'action-btn';
-        down.textContent = '↓';
-        down.addEventListener('click', () => moveItem(i, 1));
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'action-btn';
+        deleteBtn.textContent = '↓ 削除';
+        deleteBtn.addEventListener('click', () => deleteItem(i));
 
-        const edit = document.createElement('button');
-        edit.className = 'action-btn';
-        edit.textContent = '編集';
-        edit.addEventListener('click', () => startEdit(i));
-
-        const del = document.createElement('button');
-        del.className = 'action-btn';
-        del.textContent = '削除';
-        del.addEventListener('click', () => deleteItem(i));
-
-        actions.appendChild(up);
-        actions.appendChild(down);
-        actions.appendChild(edit);
-        actions.appendChild(del);
+        actions.appendChild(editBtn);
+        actions.appendChild(deleteBtn);
 
         main.appendChild(left);
         main.appendChild(actions);
