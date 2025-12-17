@@ -437,12 +437,13 @@
     }
 
     .actions{
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      align-items: stretch;
-      white-space: nowrap;
+      display: grid;
+      grid-template-columns: auto auto;
+      gap: 6px 8px;
+      align-items: center;
+      justify-items: stretch;
     }
+
 
     .action-btn{
       padding: 6px 10px;
@@ -1313,18 +1314,30 @@
         const actions = document.createElement('div');
         actions.className = 'actions';
 
-        const editBtn = document.createElement('button');
-        editBtn.className = 'action-btn';
-        editBtn.textContent = '↑ 編集';
-        editBtn.addEventListener('click', () => startEdit(i));
+        const up = document.createElement('button');
+        up.className = 'action-btn';
+        up.textContent = '↑';
+        up.addEventListener('click', () => moveItem(i, -1));
 
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'action-btn';
-        deleteBtn.textContent = '↓ 削除';
-        deleteBtn.addEventListener('click', () => deleteItem(i));
+        const edit = document.createElement('button');
+        edit.className = 'action-btn';
+        edit.textContent = '編集';
+        edit.addEventListener('click', () => startEdit(i));
 
-        actions.appendChild(editBtn);
-        actions.appendChild(deleteBtn);
+        const down = document.createElement('button');
+        down.className = 'action-btn';
+        down.textContent = '↓';
+        down.addEventListener('click', () => moveItem(i, 1));
+
+        const del = document.createElement('button');
+        del.className = 'action-btn';
+        del.textContent = '削除';
+        del.addEventListener('click', () => deleteItem(i));
+
+        actions.appendChild(up);
+        actions.appendChild(edit);
+        actions.appendChild(down);
+        actions.appendChild(del);
 
         main.appendChild(left);
         main.appendChild(actions);
