@@ -1029,36 +1029,40 @@
       showToast('GoogleマップURLを自動セットしました');
     }
 
-    let predTimer = null;
-    spotNameInput.addEventListener('input', () => {
-      selectedPlace = null;
-      const q = safeTrim(spotNameInput.value);
-      if(q.length < 2){
-        closePanel();
-        return;
-      }
-      if(!ensurePlaces()){
-        return;
-      }
+let predTimer = null;
 
-      clearTimeout(predTimer);
-      predTimer = setTimeout(() => {
-        autocompleteService.getPlacePredictions(
-          { input: q, language:'ja', region:'jp' },
-          (predictions, status) => {
-          
-if(status !== google.maps.places.PlacesServiceStatus.OK){
-  console.error("Google Places エラー:", status);
-  alert("Googleマップ検索エラー: " + status);
-  closePanel();
-  return;
-}
- renderPredictions(predictions);
+spotNameInput.addEventListener('input', () => {
+  selectedPlace = null;
+  const q = safeTrim(spotNameInput.value);
+
+  clearTimeout(predTimer);
+
+  if (q.length < 2) {
+    closePanel();
+    return;
+  }
+
+  if (!ensurePlaces()) {
+    alert("Google Maps APIが読み込まれていません");
+    return;
+  }
+
+  predTimer = setTimeout(() => {
+    autocompleteService.getPlacePredictions(
+      { input: q, language: 'ja', region: 'jp' },
+      (predictions, status) => {
+        if (status !== google.maps.places.PlacesServiceStatus.OK) {
+          console.error("Google Places エラー:", status);
+          alert("Googleマップ検索エラー: " + status);
+          closePanel();
+          return;
         }
-      );
-    }, 180);
-  });
 
+        renderPredictions(predictions);
+      }
+    );
+  }, 180);
+});
   document.addEventListener('click', (e) => {
       if(!acPanel.contains(e.target) && e.target !== spotNameInput){
         closePanel();
