@@ -1046,9 +1046,12 @@
         autocompleteService.getPlacePredictions(
           { input: q, language:'ja', region:'jp' },
           (predictions, status) => {
-            if(status !== google.maps.places.PlacesServiceStatus.OK){
-              closePanel();
-              return;
+           if(status !== google.maps.places.PlacesServiceStatus.OK){
+  console.error("Google Places エラー:", status);
+  alert("Googleマップ検索エラー: " + status);
+  closePanel();
+  return;
+} 
             }
             renderPredictions(predictions);
           }
