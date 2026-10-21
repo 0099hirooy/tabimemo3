@@ -546,12 +546,37 @@
       .share-input{ overflow-wrap:anywhere; }
     }
 
-    /* ===== スマホ横スクロール完全防止 ===== */
-    html, body{
-      width: 100%;
-      overflow-x: hidden;
-    }
-    .wrap{ overflow-x: hidden; }
+/* スマホの横揺れ対策 */
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.wrap, .card {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.card {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  .eta-row select {
+    width: auto;
+    min-width: 0;
+    flex: 1 1 140px;
+    max-width: 100%;
+  }
+
+  .toast {
+    max-width: calc(100vw - 24px);
+    white-space: normal;
+    text-align: center;
+  }
+}
   </style>
 </head>
 
